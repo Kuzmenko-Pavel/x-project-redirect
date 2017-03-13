@@ -1,0 +1,3 @@
+[run]
+source = redirect
+omit = redirect/test*

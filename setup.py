@@ -1,51 +1,44 @@
 import os
+import re
 
 from setuptools import setup, find_packages
 
-here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.txt')) as f:
-    README = f.read()
-with open(os.path.join(here, 'CHANGES.txt')) as f:
-    CHANGES = f.read()
 
-requires = [
-    'pyramid',
-    'pyramid_jinja2',
-    'pyramid_debugtoolbar',
-    'waitress',
-]
+def read_version():
+    regexp = re.compile(r"^__version__\W*=\W*'([\d.abrc]+)'")
+    init_py = os.path.join(os.path.dirname(__file__),
+                           'x_project_redirect', '__init__.py')
+    with open(init_py) as f:
+        for line in f:
+            match = regexp.match(line)
+            if match is not None:
+                return match.group(1)
+        else:
+            msg = 'Cannot find version in x_project_redirect/__init__.py'
+            raise RuntimeError(msg)
 
-tests_require = [
-    'WebTest >= 1.3.1',  # py3 compat
-    'pytest',
-    'pytest-cov',
-]
+
+install_requires = ['aiohttp',
+                    'aiodns',
+                    'ujson',
+                    'trafaret-config',
+                    'pytz',
+                    'aiohttp_jinja2',
+                    'uvloop'
+                    ]
 
 setup(
-    name='redirect',
-    version='0.0',
-    description='redirect',
-    long_description=README + '\n\n' + CHANGES,
-    classifiers=[
-        'Programming Language :: Python',
-        'Framework :: Pyramid',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
-    ],
-    author='',
-    author_email='',
-    url='',
-    keywords='web pyramid pylons',
+    name="x_project_redirect",
+    version=read_version(),
+    url="",
     packages=find_packages(),
-    include_package_data=True,
+    package_data={
+
+    },
+    install_requires=install_requires,
     zip_safe=False,
-    extras_require={
-        'testing': tests_require,
-    },
-    install_requires=requires,
     entry_points={
-        'paste.app_factory': [
-            'main = redirect:main',
+        'console_scripts': [
         ],
-    },
+    }
 )

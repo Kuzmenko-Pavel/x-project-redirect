@@ -1,2 +1,18 @@
 host: 0.0.0.0
 port: 8080
+celery:
+  broker_url: amqp://x-project-celery-dev:x-project-celery-dev@srv-4.yottos.com/x-project-celery-dev
+  task_serializer: json
+  result_serializer: json
+  timezone: Europe/Kiev
+  enable_utc: true
+  task_default_queue: normal
+  task_default_exchange: normal
+  task_default_routing_key: normal
+  imports: [x_project_redirect.celery_worker.tasks,]
+  worker_pool_restarts: true
+  task_routes:
+    x_project_redirect.celery_worker.tasks.*:
+      queue: click,
+      exchange: click
+      routing_key: click

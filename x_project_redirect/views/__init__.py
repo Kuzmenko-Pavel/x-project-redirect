@@ -1,3 +1,3 @@
-from .api import ApiView
+__all__ = ['click', 'validate', 'filtered', 'redirect']
 
-__all__ = [ApiView, ]
+from .api import click, validate, filtered, redirect

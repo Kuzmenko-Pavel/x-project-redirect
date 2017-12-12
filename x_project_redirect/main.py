@@ -8,6 +8,7 @@ from aiohttp import web
 from trafaret_config import commandline
 
 from x_project_redirect.templates import init_templates
+from x_project_redirect.celery_worker import init_celery
 from x_project_redirect.logger import logger, exception_message
 from x_project_redirect.middlewares import setup_middlewares
 from x_project_redirect.routes import setup_routes
@@ -28,6 +29,7 @@ def init(loop, argv):
     config['socket'] = options.socket
     app = web.Application(loop=loop)
     app['config'] = config
+    init_celery(config)
     init_templates(app)
     setup_routes(app)
     setup_middlewares(app)

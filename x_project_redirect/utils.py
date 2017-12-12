@@ -7,7 +7,8 @@ primitive_ip_regexp = r'^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
 
 TRAFARET_CONF = T.Dict({
     T.Key('host'): T.Regexp(primitive_ip_regexp),
-    T.Key('port'): T.Int()
+    T.Key('port'): T.Int(),
+    T.Key('celery'): T.Any()
 })
 
 

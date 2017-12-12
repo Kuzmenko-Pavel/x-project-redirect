@@ -24,7 +24,8 @@ install_requires = ['aiohttp',
                     'trafaret-config',
                     'pytz',
                     'aiohttp_jinja2',
-                    'uvloop'
+                    'uvloop',
+                    'Celery'
                     ]
 
 setup(

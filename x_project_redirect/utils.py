@@ -20,3 +20,14 @@ def exception_message():
     linecache.checkcache(filename)
     line = linecache.getline(filename, lineno, f.f_globals)
     return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+
+
+def encryptDecrypt(input, ip):
+    key = list(ip)
+    output = []
+
+    for i in range(len(input)):
+        xor_num = ord(input[i]) ^ ord(key[i % len(key)])
+        output.append(chr(xor_num))
+
+    return ''.join(output)

@@ -50,7 +50,6 @@ def load():
 
 
 def get_config():
-    print('get_config')
     dir_path = os.path.dirname(os.path.realpath(__file__))
     options = {'yaml': dir_path + '/../../conf.yaml'}
     config = config_from_options(options, TRAFARET_CONF)

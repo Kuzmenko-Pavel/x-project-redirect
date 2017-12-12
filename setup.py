@@ -25,7 +25,8 @@ install_requires = ['aiohttp',
                     'pytz',
                     'aiohttp_jinja2',
                     'uvloop',
-                    'Celery'
+                    'Celery',
+                    'aiohttp_debugtoolbar'
                     ]
 
 setup(

@@ -5,6 +5,8 @@ import os
 import sys
 
 from aiohttp import web
+import aiohttp_debugtoolbar
+from aiohttp_debugtoolbar import toolbar_middleware_factory
 from trafaret_config import commandline
 
 from x_project_redirect.templates import init_templates
@@ -27,7 +29,8 @@ def init(loop, argv):
     options = ap.parse_args(argv)
     config = commandline.config_from_options(options, TRAFARET_CONF)
     config['socket'] = options.socket
-    app = web.Application(loop=loop)
+    app = web.Application(loop=loop, middlewares=[toolbar_middleware_factory])
+    aiohttp_debugtoolbar.setup(app, intercept_redirects=False)
     app['config'] = config
     init_celery(config)
     init_templates(app)

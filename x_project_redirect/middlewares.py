@@ -59,9 +59,31 @@ async def cookie_middleware(app, handler):
     return middleware
 
 
+async def referer_middleware(app, handler):
+    async def middleware(request):
+        headers = request.headers
+        request.referer = headers.get('Referer', '')
+        response = await handler(request)
+        return response
+
+    return middleware
+
+
+async def user_agent_middleware(app, handler):
+    async def middleware(request):
+        headers = request.headers
+        request.user_agent = headers.get('User-Agent', '')
+        response = await handler(request)
+        return response
+
+    return middleware
+
+
 def setup_middlewares(app):
     error_middleware = error_pages({404: handle_404,
                                     405: handle_405,
                                     500: handle_500})
     app.middlewares.append(error_middleware)
     app.middlewares.append(cookie_middleware)
+    app.middlewares.append(referer_middleware)
+    app.middlewares.append(user_agent_middleware)

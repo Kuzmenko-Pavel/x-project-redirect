@@ -20,13 +20,14 @@ def read_version():
 
 install_requires = ['aiohttp',
                     'aiodns',
+                    'cchardet',
                     'ujson',
                     'trafaret-config',
                     'pytz',
                     'aiohttp_jinja2',
-                    'uvloop',
-                    'Celery',
-                    'aiohttp_debugtoolbar'
+                    'uvloop==0.10.2',
+                    'aiohttp_debugtoolbar',
+                    'celery'
                     ]
 
 setup(

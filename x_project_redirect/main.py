@@ -6,7 +6,6 @@ import sys
 
 from aiohttp import web
 import aiohttp_debugtoolbar
-from aiohttp_debugtoolbar import toolbar_middleware_factory
 from trafaret_config import commandline
 
 from x_project_redirect.templates import init_templates
@@ -15,6 +14,7 @@ from x_project_redirect.logger import logger, exception_message
 from x_project_redirect.middlewares import setup_middlewares
 from x_project_redirect.routes import setup_routes
 from x_project_redirect.utils import TRAFARET_CONF
+
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -29,9 +29,10 @@ def init(loop, argv):
     options = ap.parse_args(argv)
     config = commandline.config_from_options(options, TRAFARET_CONF)
     config['socket'] = options.socket
-    app = web.Application(loop=loop, middlewares=[toolbar_middleware_factory])
-    aiohttp_debugtoolbar.setup(app, intercept_redirects=False)
+    app = web.Application(loop=loop)
     app['config'] = config
+    if app['config']['debug']['console']:
+        aiohttp_debugtoolbar.setup(app)
     init_celery(config)
     init_templates(app)
     setup_routes(app)

@@ -8,7 +8,7 @@ import json
 dir_path = os.path.dirname(os.path.realpath(__file__))
 logger = logging.getLogger('x_project_redirect')
 f = logging.Formatter('[L:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(f)
 logger.addHandler(consoleHandler)

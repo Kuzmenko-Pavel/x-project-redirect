@@ -1,5 +1,6 @@
 host: 0.0.0.0
 port: 8080
+
 celery:
   broker_url: amqp://x-project-celery-dev:x-project-celery-dev@srv-4.yottos.com/x-project-celery-dev
   task_serializer: json
@@ -16,3 +17,7 @@ celery:
       queue: click,
       exchange: click
       routing_key: click
+
+debug:
+  status: False
+  console: False

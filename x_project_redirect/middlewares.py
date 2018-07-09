@@ -84,6 +84,6 @@ def setup_middlewares(app):
                                     405: handle_405,
                                     500: handle_500})
     app.middlewares.append(error_middleware)
-    app.middlewares.append(cookie_middleware)
-    app.middlewares.append(referer_middleware)
-    app.middlewares.append(user_agent_middleware)
+    # app.middlewares.append(cookie_middleware)
+    # app.middlewares.append(referer_middleware)
+    # app.middlewares.append(user_agent_middleware)

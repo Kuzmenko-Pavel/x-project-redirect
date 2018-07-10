@@ -2,7 +2,7 @@ host: 0.0.0.0
 port: 8080
 
 celery:
-  broker_url: amqp://x-project-click:x-project-click@localhost/x-project-click
+  broker_url: amqp://x-project-click:x-project-click@amqp.yottos.com/x-project-click
   task_serializer: json
   result_serializer: json
   timezone: Europe/Kiev

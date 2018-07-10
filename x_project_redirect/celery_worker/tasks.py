@@ -1,13 +1,12 @@
 from datetime import datetime
 from dateutil import parser
-from uuid import UUID
+from uuid import UUID, uuid4
 import pyodbc
 from x_project_redirect.celery_worker import app
 
 
 def mssql_connection_adload():
-    conn = pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=srv-3.yottos.com;DATABASE=Adload;UID=web;PWD=odif8duuisdofj')
-    return conn
+    return pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=srv-3.yottos.com;DATABASE=Adload;UID=web;PWD=odif8duuisdofj')
 
 
 def add_click(offer_id, campaign_id, click_datetime=None, social=None, cost_percent_click=None):
@@ -16,6 +15,11 @@ def add_click(offer_id, campaign_id, click_datetime=None, social=None, cost_perc
     except ValueError as ex:
         print(ex)
         return {'ok': False, 'error': 'offer_id should be uuid string! %s' % ex}
+    try:
+        UUID(campaign_id)
+    except ValueError as ex:
+        print(ex)
+        return {'ok': False, 'error': 'campaign_id should be uuid string! %s' % ex}
 
     try:
         dt = parser.parse(click_datetime)
@@ -35,11 +39,21 @@ def add_click(offer_id, campaign_id, click_datetime=None, social=None, cost_perc
         print("Записываем переход")
         social = int(social)
         try:
-            with connection_adload.cursor() as cursor:
-                cursor.callproc('ClickAdd', (offer_id, campaign_id, None, dt, social, cost_percent_click))
-                for row in cursor:
-                    print(row)
-                    click_cost = float(row.get('ClickCost', 0.0))
+            with mssql_connection_adload() as connection_adload:
+                with connection_adload.cursor() as cursor:
+                    sql = '''
+                    SET NOCOUNT ON;
+                    DECLARE @RC int
+                    EXECUTE @RC = [Adload].[dbo].[ClickAdd] 
+                       '%s'
+                      ,'%s'
+                      ,null
+                      ,null
+                      ,0
+                      ,100
+                    ''' % (offer_id, campaign_id)
+                    cursor.execute(sql)
+                    click_cost = float(cursor.fetchval())
         except Exception as ex:
             print(ex)
             return {'ok': False, 'error': str(ex)}

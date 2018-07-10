@@ -45,7 +45,7 @@ class BaseProcessing:
         return self.utm_rand
 
     async def get_default_utm(self, name):
-        return ''
+        return 'yottos_facebook'
 
     async def __add_makros(self, params, values):
         for key, value in params.items():

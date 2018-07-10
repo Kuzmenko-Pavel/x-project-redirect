@@ -8,8 +8,8 @@ from x_project_redirect.celery_worker.tasks import add
 
 class FbProcessing(BaseProcessing):
     source = 'fb'
-    utm_source = 'yottos_fb'
-    utm_campaign = 'yottos'
+    utm_source = 'yottos_facebook'
+    utm_campaign = 'yottos_facebook'
 
     async def click(self):
         query = self.request.query_string
@@ -51,4 +51,4 @@ class FbProcessing(BaseProcessing):
                 add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
         else:
             url = 'https://yottos.com'
-        return web.Response(text='Hello FB!\n %s' % url)
+        return web.HTTPFound(url)

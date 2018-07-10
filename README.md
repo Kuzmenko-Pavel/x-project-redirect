@@ -22,3 +22,8 @@ Getting Started
 - Run your project.
 
     env/bin/python -m x_project_redirect
+
+- Run celery project.
+
+    env/bin/celery worker -A x_project_redirect.celery_worker -Q click -l DEBUG
+

@@ -4,19 +4,19 @@ from x_project_redirect.processing import Processing
 
 async def click(request):
     processing = Processing(request)
-    return processing.click()
+    return await processing.click()
 
 
 async def validate(request):
     processing = Processing(request)
-    return processing.validate()
+    return await processing.validate()
 
 
 async def filtered(request):
     processing = Processing(request)
-    return processing.filtered()
+    return await processing.filtered()
 
 
 async def redirect(request):
     processing = Processing(request)
-    return processing.redirect()
+    return await processing.redirect()

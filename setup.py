@@ -27,7 +27,9 @@ install_requires = ['aiohttp',
                     'aiohttp_jinja2',
                     'uvloop==0.10.2',
                     'aiohttp_debugtoolbar',
-                    'celery'
+                    'celery',
+                    'python-dateutil',
+                    'pyodbc'
                     ]
 
 setup(

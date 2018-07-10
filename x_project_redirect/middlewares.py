@@ -1,8 +1,12 @@
 from aiohttp import hdrs, web
 import time
+import re
 from datetime import datetime, timedelta
 
 from x_project_redirect.logger import logger, exception_message
+
+
+ip_regex = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
 
 
 async def handle_404(request, response):
@@ -59,6 +63,31 @@ async def cookie_middleware(app, handler):
     return middleware
 
 
+async def ip_middleware(app, handler):
+    async def middleware(request):
+        host = '127.0.0.1'
+        x_real_ip = request.headers.get('X-Real-IP', request.headers.get('X-Forwarded-For', ''))
+        x_real_ip_check = ip_regex.match(x_real_ip)
+        if x_real_ip_check:
+            x_real_ip = x_real_ip_check.group()
+        else:
+            x_real_ip = None
+        if x_real_ip:
+            host = x_real_ip
+        else:
+            try:
+                peername = request.transport.get_extra_info('peername')
+                if peername and isinstance(peername, tuple):
+                    host, _ = peername
+            except Exception as ex:
+                logger.error(exception_message(exc=str(ex), request=str(request._message)))
+        request.ip = host
+        response = await handler(request)
+        return response
+
+    return middleware
+
+
 async def referer_middleware(app, handler):
     async def middleware(request):
         headers = request.headers
@@ -84,6 +113,7 @@ def setup_middlewares(app):
                                     405: handle_405,
                                     500: handle_500})
     app.middlewares.append(error_middleware)
-    # app.middlewares.append(cookie_middleware)
-    # app.middlewares.append(referer_middleware)
-    # app.middlewares.append(user_agent_middleware)
+    app.middlewares.append(ip_middleware)
+    app.middlewares.append(cookie_middleware)
+    app.middlewares.append(referer_middleware)
+    app.middlewares.append(user_agent_middleware)

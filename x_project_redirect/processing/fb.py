@@ -4,6 +4,7 @@ import binascii
 from datetime import datetime
 from .base import BaseProcessing
 from x_project_redirect.celery_worker.tasks import add
+from x_project_redirect.logger import logger, exception_message
 
 
 class FbProcessing(BaseProcessing):
@@ -30,8 +31,8 @@ class FbProcessing(BaseProcessing):
         query = self.request.query_string
         try:
             query_lines = base64.urlsafe_b64decode(query).decode('utf-8')
-        except binascii.Error as e:
-            print(e)
+        except binascii.Error as ex:
+            logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
             query_lines = ''
         params = dict([(x.partition('=')[0], x.partition('=')[2]) for x in query_lines.splitlines()])
         campaign = params.get('camp')
@@ -47,7 +48,7 @@ class FbProcessing(BaseProcessing):
             try:
                 add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
             except Exception as ex:
-                print(ex)
+                logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
                 add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
         else:
             url = 'https://yottos.com'

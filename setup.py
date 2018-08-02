@@ -29,7 +29,8 @@ install_requires = ['aiohttp',
                     'aiohttp_debugtoolbar',
                     'celery',
                     'python-dateutil',
-                    'pyodbc'
+                    'pyodbc',
+                    'ua-parser>=0.4.1'
                     ]
 
 setup(

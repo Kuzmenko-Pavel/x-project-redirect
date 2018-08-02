@@ -1,6 +1,10 @@
 from aiohttp.web import HTTPNotImplemented, HTTPFound
-from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse
+import base64
+import binascii
+from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse, unquote
 import random
+
+from x_project_redirect.logger import logger, exception_message
 
 
 class BaseProcessing:
@@ -77,3 +81,27 @@ class BaseProcessing:
 
     async def utm_converter(self, url, offer, campaign):
         return await self.__add_dynamic_param(url, offer, campaign)
+
+    async def _decode_base64(self, data):
+        val = ''
+        try:
+
+            try:
+                data = unquote(unquote(data))
+            except Exception as ex:
+                logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
+
+            try:
+                val = base64.urlsafe_b64decode(data).decode('utf-8')
+            except binascii.Error as ex:
+                if str(ex) == 'Incorrect padding':
+                    missing_padding = len(data) % 4
+                    if missing_padding != 0:
+                        data += '=' * (4 - missing_padding)
+                    val = await self._decode_base64(data)
+                else:
+                    logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
+
+        except binascii.Error as ex:
+            logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
+        return val

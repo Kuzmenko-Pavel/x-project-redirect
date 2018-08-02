@@ -32,8 +32,10 @@ def error_pages(overrides):
                 else:
                     return await override(request, response)
             except web.HTTPException as ex:
-                if ex.status != 404:
+                if ex.status not in [404, 405]:
                     logger.error(exception_message(exc=str(ex), request=str(request._message)))
+                else:
+                    logger.warning(exception_message(exc=str(ex), request=str(request._message)))
                 override = overrides.get(ex.status)
                 if override is None:
                     raise

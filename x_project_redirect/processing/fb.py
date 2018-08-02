@@ -1,6 +1,4 @@
 from aiohttp import web
-import base64
-import binascii
 from datetime import datetime
 from .base import BaseProcessing
 from x_project_redirect.celery_worker.tasks import add
@@ -29,11 +27,7 @@ class FbProcessing(BaseProcessing):
 
     async def redirect(self):
         query = self.request.query_string
-        try:
-            query_lines = base64.urlsafe_b64decode(query).decode('utf-8')
-        except binascii.Error as ex:
-            logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
-            query_lines = ''
+        query_lines = await self._decode_base64(query)
         params = dict([(x.partition('=')[0], x.partition('=')[2]) for x in query_lines.splitlines()])
         campaign = params.get('camp')
         offer = params.get('id')

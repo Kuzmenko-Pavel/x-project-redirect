@@ -1,4 +1,3 @@
-from aiohttp import web
 from datetime import datetime
 from .base import BaseProcessing
 from x_project_redirect.celery_worker.tasks import add
@@ -13,17 +12,26 @@ class FbProcessing(BaseProcessing):
     async def click(self):
         query = self.request.query_string
         location = self.request.app.router['validate'].url_for(source=self.source).with_query(query)
-        return web.HTTPFound(location)
+        if self.request.bot:
+            logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
+            return self.http_found(location)
+        return self.http_found(location)
 
     async def validate(self):
         query = self.request.query_string
         location = self.request.app.router['filtered'].url_for(source=self.source).with_query(query)
-        return web.HTTPFound(location)
+        if self.request.bot:
+            logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
+            return self.http_header_found(location)
+        return self.http_found(location)
 
     async def filtered(self):
         query = self.request.query_string
         location = self.request.app.router['redirect'].url_for(source=self.source).with_query(query)
-        return web.HTTPFound(location)
+        if self.request.bot:
+            logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
+            return self.http_js_found(location)
+        return self.http_found(location)
 
     async def redirect(self):
         query = self.request.query_string
@@ -39,11 +47,14 @@ class FbProcessing(BaseProcessing):
         click_datetime = datetime.now()
         if campaign and offer and url:
             url = await self.utm_converter(url, offer, campaign)
-            try:
-                add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
-            except Exception as ex:
-                logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
-                add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
+            if not self.request.bot:
+                try:
+                    add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
+                except Exception as ex:
+                    logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
+                    add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
+            else:
+                logger.warning(exception_message(exc='BOT SEND TO URL', request=str(self.request.message)))
         else:
             url = 'https://yottos.com'
-        return web.HTTPFound(url)
+        return self.http_found(url)

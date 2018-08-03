@@ -1,4 +1,5 @@
 from aiohttp.web import HTTPNotImplemented, HTTPFound
+import aiohttp_jinja2
 import base64
 import binascii
 from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse, unquote
@@ -105,3 +106,12 @@ class BaseProcessing:
         except binascii.Error as ex:
             logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
         return val
+
+    def http_found(self, url):
+        return HTTPFound(url)
+
+    def http_header_found(self, url):
+        return aiohttp_jinja2.render_template('header_found.html', self.request, {'url': url})
+
+    def http_js_found(self, url):
+        return aiohttp_jinja2.render_template('js_found.html', self.request, {'url': url, 'nonce': self.request.nonce})

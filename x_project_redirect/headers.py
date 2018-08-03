@@ -121,8 +121,10 @@ def detect_bot():
         def wrapped(*args):
             if isinstance(args[0], AbstractView):
                 args[0].request.bot = simple_parse(args[0].request.headers[hdrs.USER_AGENT])
+                args[0].request.bot = True
             else:
                 args[-1].bot = simple_parse(args[-1].headers[hdrs.USER_AGENT])
+                args[-1].bot = True
 
             if asyncio.iscoroutinefunction(func):
                 coro = func

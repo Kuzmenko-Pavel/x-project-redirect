@@ -1,4 +1,4 @@
-__all__ = ['cache', 'cookie', 'csp', 'not_robot']
+__all__ = ['cache', 'cookie', 'csp', 'not_robot', 'detect_bot']
 import asyncio
 import functools
 from datetime import datetime, timedelta
@@ -114,15 +114,15 @@ def csp():
     return wrapper
 
 
-def detect_device():
+def detect_bot():
     def wrapper(func):
         @asyncio.coroutine
         @functools.wraps(func)
         def wrapped(*args):
             if isinstance(args[0], AbstractView):
-                args[0].request.device = simple_parse(args[0].request.headers[hdrs.USER_AGENT])
+                args[0].request.bot = simple_parse(args[0].request.headers[hdrs.USER_AGENT])
             else:
-                args[-1].device = simple_parse(args[-1].headers[hdrs.USER_AGENT])
+                args[-1].bot = simple_parse(args[-1].headers[hdrs.USER_AGENT])
 
             if asyncio.iscoroutinefunction(func):
                 coro = func

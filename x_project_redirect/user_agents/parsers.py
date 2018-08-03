@@ -1,8 +1,16 @@
 from collections import namedtuple
+import re
 
 from ua_parser import user_agent_parser
 from .compat import string_types
 
+
+BOTS_FAMILIES = (
+    'libwww-perl',
+    'YATSH crawler'
+)
+
+BOTS_RE = re.compile('spider|phantomjs|casperjs|analyzer|daum|scanner|check|bot|okhttp|omgili|ltx71|curl|wget|newspaper|lipperhey|binlar|ahc|apache|proximic|embedly|http-client|preview|flipboard|parser|ips-agent|nutch|httrack|brandverity|fetch|httpunit|http_get|siteimprove|vkshare|siteexplorer|python|sentry|coccoc')
 
 MOBILE_DEVICE_FAMILIES = (
     'iPhone',
@@ -187,11 +195,14 @@ class UserAgent(object):
 
     @property
     def is_tablet(self):
+        os_family = '%s %s' % (self.os.family, self.os.version_string)
         if self.device.family in TABLET_DEVICE_FAMILIES:
             return True
         if (self.os.family == 'Android' and self._is_android_tablet()):
             return True
         if self.os.family.startswith('Windows RT'):
+            return True
+        if os_family.startswith('Windows RT'):
             return True
         if self.os.family == 'Firefox OS' and 'Mobile' not in self.browser.family:
             return True
@@ -230,12 +241,17 @@ class UserAgent(object):
 
     @property
     def is_touch_capable(self):
+        os_family_version = '%s %s' % (self.os.family, self.os.version_string)
         # TODO: detect touch capable Nokia devices
         if self.os.family in TOUCH_CAPABLE_OS_FAMILIES:
+            return True
+        if os_family_version in TOUCH_CAPABLE_OS_FAMILIES:
             return True
         if self.device.family in TOUCH_CAPABLE_DEVICE_FAMILIES:
             return True
         if self.os.family.startswith('Windows 8') and 'Touch' in self.ua_string:
+            return True
+        if os_family_version.startswith('Windows 8') and 'Touch' in self.ua_string:
             return True
         if 'BlackBerry' in self.os.family and self._is_blackberry_touch_capable_device():
             return True
@@ -243,8 +259,13 @@ class UserAgent(object):
 
     @property
     def is_pc(self):
+        if 'spider' in self.ua_string.lower():
+            return False
+        os_family_version = '%s %s' % (self.os.family, self.os.version_string)
         # Returns True for "PC" devices (Windows, Mac and Linux)
         if 'Windows NT' in self.ua_string or self.os.family in PC_OS_FAMILIES:
+            return True
+        if os_family_version in PC_OS_FAMILIES:
             return True
         # TODO: remove after https://github.com/tobie/ua-parser/issues/127 is closed
         if self.os.family == 'Mac OS X' and 'Silk' not in self.ua_string:
@@ -260,7 +281,15 @@ class UserAgent(object):
 
     @property
     def is_bot(self):
-        return True if self.device.family == 'Spider' else False
+        ua_string_l = self.ua_string.lower()
+        if BOTS_RE.search(ua_string_l):
+            return True
+        if self.device.family == 'Spider':
+            return True
+        if self.browser.family in BOTS_FAMILIES:
+            return True
+
+        return False
 
     @property
     def is_email_client(self):
@@ -293,25 +322,4 @@ def parse(user_agent_string):
 
 def simple_parse(user_agent_string):
     user_agent = UserAgent(user_agent_string)
-    if user_agent.is_pc:
-        return 'pc'
-
-    if user_agent.is_mobile:
-        if user_agent.is_apple:
-            return 'ap'
-        elif user_agent.is_android:
-            return 'np'
-        elif user_agent.is_windows:
-            return 'wp'
-
-    if user_agent.is_tablet:
-        if user_agent.is_apple:
-            return 'at'
-        elif user_agent.is_android:
-            return 'nt'
-        elif user_agent.is_windows:
-            return 'wt'
-
-    if user_agent.is_bot:
-        return 'bt'
-    return 'oh'
+    return user_agent.is_bot

@@ -236,136 +236,136 @@ class UserAgentsTest(unittest.TestCase):
         self.assertFalse(android_firefox_aurora_ua.is_email_client)
 
     def test_is_pc_simple_parser(self):
-        self.assertFalse(simple_iphone_ua == 'pc')
-        self.assertFalse(simple_galaxy_s3_ua == 'pc')
-        self.assertFalse(simple_ipad_ua == 'pc')
-        self.assertFalse(simple_playbook_ua == 'pc')
-        self.assertFalse(simple_kindle_fire_ua == 'pc')
-        self.assertFalse(simple_nexus_7_ua == 'pc')
-        self.assertFalse(simple_windows_phone_ua == 'pc')
-        self.assertFalse(simple_blackberry_bold_touch_ua == 'pc')
-        self.assertFalse(simple_blackberry_torch_ua == 'pc')
-        self.assertFalse(simple_blackberry_bold_ua == 'pc')
-        self.assertFalse(simple_j2me_opera_ua == 'pc')
-        self.assertFalse(simple_google_bot_ua == 'pc')
-        self.assertFalse(simple_nokia_n97_ua == 'pc')
-        self.assertTrue(simple_mac_safari_ua == 'pc')
-        self.assertTrue(simple_windows_ie_ua == 'pc')
-        self.assertTrue(simple_ubuntu_firefox_ua == 'pc')
-        self.assertTrue(simple_ie_touch_ua == 'pc')
-        self.assertTrue(simple_ie_ua == 'pc')
-        self.assertFalse(simple_android_firefox_aurora_ua == 'pc')
-        self.assertTrue(simple_chromebook_ua == 'pc')
+        self.assertFalse(simple_iphone_ua)
+        self.assertFalse(simple_galaxy_s3_ua)
+        self.assertFalse(simple_ipad_ua)
+        self.assertFalse(simple_playbook_ua)
+        self.assertFalse(simple_kindle_fire_ua)
+        self.assertFalse(simple_nexus_7_ua)
+        self.assertFalse(simple_windows_phone_ua)
+        self.assertFalse(simple_blackberry_bold_touch_ua)
+        self.assertFalse(simple_blackberry_torch_ua)
+        self.assertFalse(simple_blackberry_bold_ua)
+        self.assertFalse(simple_j2me_opera_ua)
+        self.assertTrue(simple_google_bot_ua)
+        self.assertFalse(simple_nokia_n97_ua)
+        self.assertFalse(simple_mac_safari_ua)
+        self.assertFalse(simple_windows_ie_ua)
+        self.assertFalse(simple_ubuntu_firefox_ua)
+        self.assertFalse(simple_ie_touch_ua)
+        self.assertFalse(simple_ie_ua)
+        self.assertFalse(simple_android_firefox_aurora_ua)
+        self.assertFalse(simple_chromebook_ua)
 
     def test_is_pc_simple_apple_mobile(self):
-        self.assertTrue(simple_iphone_ua == 'ap')
-        self.assertFalse(simple_galaxy_s3_ua == 'ap')
-        self.assertFalse(simple_ipad_ua == 'ap')
-        self.assertFalse(simple_playbook_ua == 'ap')
-        self.assertFalse(simple_kindle_fire_ua == 'ap')
-        self.assertFalse(simple_nexus_7_ua == 'ap')
-        self.assertFalse(simple_windows_phone_ua == 'ap')
-        self.assertFalse(simple_blackberry_bold_touch_ua == 'ap')
-        self.assertFalse(simple_blackberry_torch_ua == 'ap')
-        self.assertFalse(simple_blackberry_bold_ua == 'ap')
-        self.assertFalse(simple_j2me_opera_ua == 'ap')
-        self.assertFalse(simple_google_bot_ua == 'ap')
-        self.assertFalse(simple_nokia_n97_ua == 'ap')
-        self.assertFalse(simple_mac_safari_ua == 'ap')
-        self.assertFalse(simple_windows_ie_ua == 'ap')
-        self.assertFalse(simple_ubuntu_firefox_ua == 'ap')
-        self.assertFalse(simple_ie_touch_ua == 'ap')
-        self.assertFalse(simple_ie_ua == 'ap')
-        self.assertFalse(simple_android_firefox_aurora_ua == 'ap')
-        self.assertFalse(simple_chromebook_ua == 'ap')
-        
+        self.assertFalse(simple_iphone_ua)
+        self.assertFalse(simple_galaxy_s3_ua)
+        self.assertFalse(simple_ipad_ua)
+        self.assertFalse(simple_playbook_ua)
+        self.assertFalse(simple_kindle_fire_ua)
+        self.assertFalse(simple_nexus_7_ua)
+        self.assertFalse(simple_windows_phone_ua)
+        self.assertFalse(simple_blackberry_bold_touch_ua)
+        self.assertFalse(simple_blackberry_torch_ua)
+        self.assertFalse(simple_blackberry_bold_ua)
+        self.assertFalse(simple_j2me_opera_ua)
+        self.assertTrue(simple_google_bot_ua)
+        self.assertFalse(simple_nokia_n97_ua)
+        self.assertFalse(simple_mac_safari_ua)
+        self.assertFalse(simple_windows_ie_ua)
+        self.assertFalse(simple_ubuntu_firefox_ua)
+        self.assertFalse(simple_ie_touch_ua)
+        self.assertFalse(simple_ie_ua)
+        self.assertFalse(simple_android_firefox_aurora_ua)
+        self.assertFalse(simple_chromebook_ua)
+
     def test_is_pc_simple_android_mobile(self):
-        self.assertFalse(simple_iphone_ua == 'np')
-        self.assertTrue(simple_galaxy_s3_ua == 'np')
-        self.assertFalse(simple_ipad_ua == 'np')
-        self.assertFalse(simple_playbook_ua == 'np')
-        self.assertFalse(simple_kindle_fire_ua == 'np')
-        self.assertFalse(simple_nexus_7_ua == 'np')
-        self.assertFalse(simple_windows_phone_ua == 'np')
-        self.assertFalse(simple_blackberry_bold_touch_ua == 'np')
-        self.assertFalse(simple_blackberry_torch_ua == 'np')
-        self.assertFalse(simple_blackberry_bold_ua == 'np')
-        self.assertFalse(simple_j2me_opera_ua == 'np')
-        self.assertFalse(simple_google_bot_ua == 'np')
-        self.assertFalse(simple_nokia_n97_ua == 'np')
-        self.assertFalse(simple_mac_safari_ua == 'np')
-        self.assertFalse(simple_windows_ie_ua == 'np')
-        self.assertFalse(simple_ubuntu_firefox_ua == 'np')
-        self.assertFalse(simple_ie_touch_ua == 'np')
-        self.assertFalse(simple_ie_ua == 'np')
-        self.assertTrue(simple_android_firefox_aurora_ua == 'np')
-        self.assertFalse(simple_chromebook_ua == 'np')
-    
+        self.assertFalse(simple_iphone_ua)
+        self.assertFalse(simple_galaxy_s3_ua)
+        self.assertFalse(simple_ipad_ua)
+        self.assertFalse(simple_playbook_ua)
+        self.assertFalse(simple_kindle_fire_ua)
+        self.assertFalse(simple_nexus_7_ua)
+        self.assertFalse(simple_windows_phone_ua)
+        self.assertFalse(simple_blackberry_bold_touch_ua)
+        self.assertFalse(simple_blackberry_torch_ua)
+        self.assertFalse(simple_blackberry_bold_ua)
+        self.assertFalse(simple_j2me_opera_ua)
+        self.assertTrue(simple_google_bot_ua)
+        self.assertFalse(simple_nokia_n97_ua)
+        self.assertFalse(simple_mac_safari_ua)
+        self.assertFalse(simple_windows_ie_ua)
+        self.assertFalse(simple_ubuntu_firefox_ua)
+        self.assertFalse(simple_ie_touch_ua)
+        self.assertFalse(simple_ie_ua)
+        self.assertFalse(simple_android_firefox_aurora_ua)
+        self.assertFalse(simple_chromebook_ua)
+
     def test_is_pc_simple_windows_mobile(self):
-        self.assertFalse(simple_iphone_ua == 'wp')
-        self.assertFalse(simple_galaxy_s3_ua == 'wp')
-        self.assertFalse(simple_ipad_ua == 'wp')
-        self.assertFalse(simple_playbook_ua == 'wp')
-        self.assertFalse(simple_kindle_fire_ua == 'wp')
-        self.assertFalse(simple_nexus_7_ua == 'wp')
-        self.assertTrue(simple_windows_phone_ua == 'wp')
-        self.assertFalse(simple_blackberry_bold_touch_ua == 'wp')
-        self.assertFalse(simple_blackberry_torch_ua == 'wp')
-        self.assertFalse(simple_blackberry_bold_ua == 'wp')
-        self.assertFalse(simple_j2me_opera_ua == 'wp')
-        self.assertFalse(simple_google_bot_ua == 'wp')
-        self.assertFalse(simple_nokia_n97_ua == 'wp')
-        self.assertFalse(simple_mac_safari_ua == 'wp')
-        self.assertFalse(simple_windows_ie_ua == 'wp')
-        self.assertFalse(simple_ubuntu_firefox_ua == 'wp')
-        self.assertFalse(simple_ie_touch_ua == 'wp')
-        self.assertFalse(simple_ie_ua == 'wp')
-        self.assertFalse(simple_android_firefox_aurora_ua == 'wp')
-        self.assertFalse(simple_chromebook_ua == 'wp')
-        
+        self.assertFalse(simple_iphone_ua)
+        self.assertFalse(simple_galaxy_s3_ua)
+        self.assertFalse(simple_ipad_ua)
+        self.assertFalse(simple_playbook_ua)
+        self.assertFalse(simple_kindle_fire_ua)
+        self.assertFalse(simple_nexus_7_ua)
+        self.assertFalse(simple_windows_phone_ua)
+        self.assertFalse(simple_blackberry_bold_touch_ua)
+        self.assertFalse(simple_blackberry_torch_ua)
+        self.assertFalse(simple_blackberry_bold_ua)
+        self.assertFalse(simple_j2me_opera_ua)
+        self.assertTrue(simple_google_bot_ua)
+        self.assertFalse(simple_nokia_n97_ua)
+        self.assertFalse(simple_mac_safari_ua)
+        self.assertFalse(simple_windows_ie_ua)
+        self.assertFalse(simple_ubuntu_firefox_ua)
+        self.assertFalse(simple_ie_touch_ua)
+        self.assertFalse(simple_ie_ua)
+        self.assertFalse(simple_android_firefox_aurora_ua)
+        self.assertFalse(simple_chromebook_ua)
+
     def test_is_pc_simple_apple_tablet(self):
-        self.assertFalse(simple_iphone_ua == 'at')
-        self.assertFalse(simple_galaxy_s3_ua == 'at')
-        self.assertTrue(simple_ipad_ua == 'at')
-        self.assertFalse(simple_playbook_ua == 'at')
-        self.assertFalse(simple_kindle_fire_ua == 'at')
-        self.assertFalse(simple_nexus_7_ua == 'at')
-        self.assertFalse(simple_windows_phone_ua == 'at')
-        self.assertFalse(simple_blackberry_bold_touch_ua == 'at')
-        self.assertFalse(simple_blackberry_torch_ua == 'at')
-        self.assertFalse(simple_blackberry_bold_ua == 'at')
-        self.assertFalse(simple_j2me_opera_ua == 'at')
-        self.assertFalse(simple_google_bot_ua == 'at')
-        self.assertFalse(simple_nokia_n97_ua == 'at')
-        self.assertFalse(simple_mac_safari_ua == 'at')
-        self.assertFalse(simple_windows_ie_ua == 'at')
-        self.assertFalse(simple_ubuntu_firefox_ua == 'at')
-        self.assertFalse(simple_ie_touch_ua == 'at')
-        self.assertFalse(simple_ie_ua == 'at')
-        self.assertFalse(simple_android_firefox_aurora_ua == 'at')
-        self.assertFalse(simple_chromebook_ua == 'at')
-        
+        self.assertFalse(simple_iphone_ua)
+        self.assertFalse(simple_galaxy_s3_ua)
+        self.assertFalse(simple_ipad_ua)
+        self.assertFalse(simple_playbook_ua)
+        self.assertFalse(simple_kindle_fire_ua)
+        self.assertFalse(simple_nexus_7_ua)
+        self.assertFalse(simple_windows_phone_ua)
+        self.assertFalse(simple_blackberry_bold_touch_ua)
+        self.assertFalse(simple_blackberry_torch_ua)
+        self.assertFalse(simple_blackberry_bold_ua)
+        self.assertFalse(simple_j2me_opera_ua)
+        self.assertTrue(simple_google_bot_ua)
+        self.assertFalse(simple_nokia_n97_ua)
+        self.assertFalse(simple_mac_safari_ua)
+        self.assertFalse(simple_windows_ie_ua)
+        self.assertFalse(simple_ubuntu_firefox_ua)
+        self.assertFalse(simple_ie_touch_ua)
+        self.assertFalse(simple_ie_ua)
+        self.assertFalse(simple_android_firefox_aurora_ua)
+        self.assertFalse(simple_chromebook_ua)
+
     def test_is_pc_simple_android_tablet(self):
-        self.assertFalse(simple_iphone_ua == 'nt')
-        self.assertFalse(simple_galaxy_s3_ua == 'nt')
-        self.assertFalse(simple_ipad_ua == 'nt')
-        self.assertFalse(simple_playbook_ua == 'nt')
-        self.assertTrue(simple_kindle_fire_ua == 'nt')
-        self.assertTrue(simple_nexus_7_ua == 'nt')
-        self.assertFalse(simple_windows_phone_ua == 'nt')
-        self.assertFalse(simple_blackberry_bold_touch_ua == 'nt')
-        self.assertFalse(simple_blackberry_torch_ua == 'nt')
-        self.assertFalse(simple_blackberry_bold_ua == 'nt')
-        self.assertFalse(simple_j2me_opera_ua == 'nt')
-        self.assertFalse(simple_google_bot_ua == 'nt')
-        self.assertFalse(simple_nokia_n97_ua == 'nt')
-        self.assertFalse(simple_mac_safari_ua == 'nt')
-        self.assertFalse(simple_windows_ie_ua == 'nt')
-        self.assertFalse(simple_ubuntu_firefox_ua == 'nt')
-        self.assertFalse(simple_ie_touch_ua == 'nt')
-        self.assertFalse(simple_ie_ua == 'nt')
-        self.assertFalse(simple_android_firefox_aurora_ua == 'nt')
-        self.assertFalse(simple_chromebook_ua == 'nt')
+        self.assertFalse(simple_iphone_ua)
+        self.assertFalse(simple_galaxy_s3_ua)
+        self.assertFalse(simple_ipad_ua)
+        self.assertFalse(simple_playbook_ua)
+        self.assertFalse(simple_kindle_fire_ua)
+        self.assertFalse(simple_nexus_7_ua)
+        self.assertFalse(simple_windows_phone_ua)
+        self.assertFalse(simple_blackberry_bold_touch_ua)
+        self.assertFalse(simple_blackberry_torch_ua)
+        self.assertFalse(simple_blackberry_bold_ua)
+        self.assertFalse(simple_j2me_opera_ua)
+        self.assertTrue(simple_google_bot_ua)
+        self.assertFalse(simple_nokia_n97_ua)
+        self.assertFalse(simple_mac_safari_ua)
+        self.assertFalse(simple_windows_ie_ua)
+        self.assertFalse(simple_ubuntu_firefox_ua)
+        self.assertFalse(simple_ie_touch_ua)
+        self.assertFalse(simple_ie_ua)
+        self.assertFalse(simple_android_firefox_aurora_ua)
+        self.assertFalse(simple_chromebook_ua)
 
     def test_strings(self):
         self.assertEqual(str(iphone_ua), "iPhone / iOS 5.1 / Mobile Safari 5.1")
@@ -407,19 +407,87 @@ class UserAgentsTest(unittest.TestCase):
 with open(os.path.join(os.path.dirname(__file__), 'devices.json')) as f:
     devices = json.load(f)
 
+with open(os.path.join(os.path.dirname(__file__), 'crawler-user-agents.json')) as f:
+    crawler_user_agents = json.load(f)
+
+with open(os.path.join(os.path.dirname(__file__), 'android-browser.json')) as f:
+    android_browser = json.load(f)
+
+with open(os.path.join(os.path.dirname(__file__), 'chrome.json')) as f:
+    chrome = json.load(f)
+
+with open(os.path.join(os.path.dirname(__file__), 'firefox.json')) as f:
+    firefox = json.load(f)
+
+with open(os.path.join(os.path.dirname(__file__), 'internet-explorer.json')) as f:
+    internet_explorer = json.load(f)
+
+with open(os.path.join(os.path.dirname(__file__), 'opera.json')) as f:
+    opera = json.load(f)
+
+with open(os.path.join(os.path.dirname(__file__), 'safari.json')) as f:
+    safari = json.load(f)
+
 
 def test_wrapper(items):
     def test_func(self):
         attrs = ('is_bot', 'is_mobile',
                  'is_pc', 'is_tablet', 'is_touch_capable')
         for attr in attrs:
-            self.assertEqual(
-                getattr(items['user_agent'], attr), items[attr], msg=attr)
-        # Temporarily commenting this out since UserAgent.device
-        # may return different string depending ua-parser version
-        # self.assertEqual(str(items['user_agent']), items['str'])
+            self.assertEqual(getattr(items['user_agent'], attr), items[attr], msg=attr)
     return test_func
+
 
 for device, items in compat.iteritems(devices):
     items['user_agent'] = parse(items['ua_string'])
     setattr(UserAgentsTest, 'test_' + device, test_wrapper(items))
+
+
+def test_wrapper_crawler(parser, bot, msg):
+    def test_func(self):
+        self.assertEqual(parser, bot, msg=msg)
+    return test_func
+
+
+for crawler in crawler_user_agents:
+    c = 0
+    for ua_string in crawler['instances']:
+        parser = simple_parse(ua_string)
+        setattr(UserAgentsTest, 'test_' + crawler['pattern'] + str(c), test_wrapper_crawler(parser, True, 'is_bot'))
+        c += 1
+
+c = 0
+for browser in android_browser:
+    parser = simple_parse(browser['ua'])
+    setattr(UserAgentsTest, 'test_android_browser_' + str(c), test_wrapper_crawler(parser, False, browser))
+    c += 1
+
+c = 0
+for browser in chrome:
+    parser = simple_parse(browser['ua'])
+    setattr(UserAgentsTest, 'test_chrome_browser_' + str(c), test_wrapper_crawler(parser, False, browser))
+    c += 1
+
+c = 0
+for browser in firefox:
+    parser = simple_parse(browser['ua'])
+    setattr(UserAgentsTest, 'test_firefox_browser_' + str(c), test_wrapper_crawler(parser, False, browser))
+    c += 1
+
+c = 0
+for browser in opera:
+    parser = simple_parse(browser['ua'])
+    setattr(UserAgentsTest, 'test_opera_browser_' + str(c), test_wrapper_crawler(parser, False, browser))
+    c += 1
+
+c = 0
+for browser in safari:
+    parser = simple_parse(browser['ua'])
+    setattr(UserAgentsTest, 'test_safari_browser_' + str(c), test_wrapper_crawler(parser, False, browser))
+    c += 1
+
+c = 0
+for browser in internet_explorer:
+    parser = simple_parse(browser['ua'])
+    setattr(UserAgentsTest, 'test_internet_explorer_browser_' + str(c), test_wrapper_crawler(parser, False, browser))
+    c += 1

@@ -11,6 +11,7 @@ from x_project_redirect.logger import logger, exception_message
 @cookie()
 @csp()
 @not_robot()
+@detect_bot()
 async def click(request):
     res = HTTPFound('https://yottos.com')
     try:
@@ -25,6 +26,7 @@ async def click(request):
 @cookie()
 @csp()
 @not_robot()
+@detect_bot()
 async def validate(request):
     res = HTTPFound('https://yottos.com')
     try:
@@ -39,6 +41,7 @@ async def validate(request):
 @cookie()
 @csp()
 @not_robot()
+@detect_bot()
 async def filtered(request):
     res = HTTPFound('https://yottos.com')
     try:
@@ -53,6 +56,7 @@ async def filtered(request):
 @cookie()
 @csp()
 @not_robot()
+@detect_bot()
 async def redirect(request):
     res = HTTPFound('https://yottos.com')
     try:

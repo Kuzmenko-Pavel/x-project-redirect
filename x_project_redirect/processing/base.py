@@ -10,11 +10,16 @@ from x_project_redirect.logger import logger, exception_message
 
 class BaseProcessing:
     source = 'base'
+    utm_default = 'yottos'
     utm_source = 'yottos'
     utm_campaign = 'yottos'
+    utm_content = 'yottos'
     utm_medium = 'yottos'
     utm_term = 'yottos'
     utm_rand = str(random.randint(0, 1000000))
+
+    makros = ['{source}', '{source_id}', '{source_guid}', '{campaign}', '{campaign_id}', '{campaign_guid}', '{name}',
+              '{offer}', '{offer_id}', '{offer_guid}', '{rand}']
 
     def __init__(self, request):
         self.request = request
@@ -34,29 +39,27 @@ class BaseProcessing:
     async def redirect(self):
         return HTTPNotImplemented()
 
-    async def get_utm_source(self, *args, **kwargs):
+    async def get_utm_source(self, offer, campaign, *args, **kwargs):
         return self.utm_source
 
-    async def get_utm_campaign(self, *args, **kwargs):
+    async def get_utm_campaign(self, offer, campaign, *args, **kwargs):
         return self.utm_campaign
 
-    async def get_utm_medium(self, *args, **kwargs):
+    async def get_utm_medium(self, offer, campaign, *args, **kwargs):
         return self.utm_medium
 
-    async def get_utm_term(self, *args, **kwargs):
+    async def get_utm_term(self, offer, campaign, *args, **kwargs):
         return self.utm_term
 
-    async def get_utm_rand(self, *args, **kwargs):
+    async def get_utm_rand(self, offer, campaign, *args, **kwargs):
         return self.utm_rand
 
     async def get_default_utm(self, name):
-        return 'yottos'
+        return self.utm_default
 
     async def __add_makros(self, params, values):
         for key, value in params.items():
-            for i in ['{source}', '{source_id}', '{source_guid}',
-                      '{campaign}', '{campaign_id}', '{campaign_guid}', '{name}',
-                      '{offer}', '{offer_id}', '{offer_guid}', '{rand}']:
+            for i in self.makros:
                 value = value.replace(i, values.get(i, await self.get_default_utm(i)))
             params[key] = value
         return urlencode(params)

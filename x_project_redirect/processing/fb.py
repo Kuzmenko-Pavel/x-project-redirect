@@ -6,9 +6,6 @@ from x_project_redirect.logger import logger, exception_message
 
 class FbProcessing(BaseProcessing):
     source = 'fb'
-    utm_source = 'yottos_facebook'
-    utm_campaign = 'yottos_facebook'
-    utm_term = 'yottos_facebook'
     utm_medium = 'cpcf'
 
     async def click(self):

@@ -8,6 +8,8 @@ class FbProcessing(BaseProcessing):
     source = 'fb'
     utm_source = 'yottos_facebook'
     utm_campaign = 'yottos_facebook'
+    utm_term = 'yottos_facebook'
+    utm_medium = 'cpcf'
 
     async def click(self):
         query = self.request.query_string
@@ -32,6 +34,11 @@ class FbProcessing(BaseProcessing):
             logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
             return self.http_js_found(location)
         return self.http_found(location)
+
+    def utm_exist(self, key, params):
+        if key == 'utm_medium':
+            return False
+        return key in params
 
     async def redirect(self):
         query = self.request.query_string

@@ -72,7 +72,7 @@ def add_click(offer_id, campaign_id, click_datetime=None, social=None, cost_perc
 def add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie):
     try:
         dt = parser.parse(click_datetime)
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, TypeError):
         dt = datetime.now()
     print(url, ip, offer, campaign, dt, referer, user_agent, cookie, sep='\n')
     print("Adload request")

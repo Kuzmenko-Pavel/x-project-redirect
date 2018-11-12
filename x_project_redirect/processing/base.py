@@ -25,15 +25,18 @@ class BaseProcessing:
         self.request = request
 
     async def click(self):
-        location = self.request.app.router['validate'].url_for(source=self.source)
+        query = self.request.query_string
+        location = self.request.app.router['validate'].url_for(source=self.source).with_query(query)
         return HTTPFound(location)
 
     async def validate(self):
-        location = self.request.app.router['filtered'].url_for(source=self.source)
+        query = self.request.query_string
+        location = self.request.app.router['filtered'].url_for(source=self.source).with_query(query)
         return HTTPFound(location)
 
     async def filtered(self):
-        location = self.request.app.router['redirect'].url_for(source=self.source)
+        query = self.request.query_string
+        location = self.request.app.router['redirect'].url_for(source=self.source).with_query(query)
         return HTTPFound(location)
 
     async def redirect(self):
@@ -125,7 +128,7 @@ class BaseProcessing:
         url = await self.__add_dynamic_param(url, offer, campaign)
         return await self.__add_utm_param(url, offer, campaign)
 
-    async def _decode_base64(self, data):
+    async def _decode_base64(self, data, recursion=None):
         val = ''
         try:
 
@@ -137,11 +140,15 @@ class BaseProcessing:
             try:
                 val = base64.urlsafe_b64decode(data).decode('utf-8')
             except binascii.Error as ex:
-                if str(ex) == 'Incorrect padding':
+                if recursion is None:
+                    recursion = 1
+                else:
+                    recursion += 1
+                if str(ex) == 'Incorrect padding' and recursion < 6:
                     missing_padding = len(data) % 4
                     if missing_padding != 0:
                         data += '=' * (4 - missing_padding)
-                    val = await self._decode_base64(data)
+                    val = await self._decode_base64(data, recursion)
                 else:
                     logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
 

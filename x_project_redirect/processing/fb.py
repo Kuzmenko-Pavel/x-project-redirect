@@ -38,7 +38,7 @@ class FbProcessing(BaseProcessing):
         return key in params
 
     async def redirect(self):
-        query = self.request.query_string
+        query = self.request.query.get('b', '')
         query_lines = await self._decode_base64(query)
         params = dict([(x.partition('=')[0], x.partition('=')[2]) for x in query_lines.splitlines()])
         campaign = params.get('camp')

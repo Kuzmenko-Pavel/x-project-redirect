@@ -15,6 +15,10 @@ Getting Started
 
     env/bin/pip install --upgrade pip setuptools
 
+- Install the project req
+
+    sudo apt install unixodbc-dev python3.5-pyodbc
+
 - Install the project in editable mode with its testing requirements.
 
     env/bin/pip install -e "."

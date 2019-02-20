@@ -46,6 +46,7 @@ def main(argv):
     app = init(loop, argv)
     app['log'] = logger
     if app['config']['socket']:
+        os.makedirs(os.path.dirname(app['config']['socket']), exist_ok=True)
         web.run_app(app, path=app['config']['socket'], backlog=1024, access_log=logger)
     else:
         web.run_app(app, host=app['config']['host'], port=app['config']['port'], backlog=1024, access_log=logger)

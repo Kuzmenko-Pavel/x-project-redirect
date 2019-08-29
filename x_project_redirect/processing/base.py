@@ -2,6 +2,7 @@ from aiohttp.web import HTTPNotImplemented, HTTPFound
 import aiohttp_jinja2
 import base64
 import binascii
+from uuid import uuid4
 from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse, unquote
 import random
 
@@ -17,6 +18,7 @@ class BaseProcessing:
     utm_medium = 'yottos'
     utm_term = 'yottos'
     utm_rand = str(random.randint(0, 1000000))
+    cid = str(uuid4())
 
     makros = ['{source}', '{source_id}', '{source_guid}', '{campaign}', '{campaign_id}', '{campaign_guid}', '{name}',
               '{offer}', '{offer_id}', '{offer_guid}', '{rand}']
@@ -101,6 +103,8 @@ class BaseProcessing:
                 url_parts[3] = await self.__add_makros(params, values)
 
             query = dict(parse_qsl(url_parts[4]))
+            if 'yt_cid' not in query:
+                query.update({'yt_cid': self.cid})
             if len(query) > 0:
                 url_parts[4] = await self.__add_makros(query, values)
             url = urlunparse(url_parts)

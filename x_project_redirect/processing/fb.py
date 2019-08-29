@@ -53,10 +53,10 @@ class FbProcessing(BaseProcessing):
             url = await self.utm_converter(url, offer, campaign)
             if not self.request.bot:
                 try:
-                    add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
+                    add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, self.cid)
                 except Exception as ex:
                     logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
-                    add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie)
+                    add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, self.cid)
             else:
                 logger.warning(exception_message(exc='BOT SEND TO URL', request=str(self.request.message)))
         else:

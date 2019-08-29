@@ -30,7 +30,8 @@ install_requires = ['aiohttp',
                     'celery',
                     'python-dateutil',
                     'pyodbc',
-                    'ua-parser>=0.4.1'
+                    'ua-parser>=0.4.1',
+                    'amqplib==1.0.2'
                     ]
 
 setup(

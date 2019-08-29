@@ -44,7 +44,7 @@ class FbProcessing(BaseProcessing):
         campaign = params.get('camp')
         offer = params.get('id')
         url = params.get('url')
-        ip = self.request.referer
+        ip = self.request.ip
         referer = self.request.referer
         user_agent = self.request.user_agent
         cookie = self.request.user_cookie

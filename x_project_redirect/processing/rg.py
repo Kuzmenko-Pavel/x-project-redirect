@@ -6,7 +6,6 @@ from x_project_redirect.logger import logger, exception_message
 
 class RgProcessing(BaseProcessing):
     source = 'rg'
-    utm_medium = 'cpcf'
 
     async def click(self):
         query = self.request.query_string
@@ -41,9 +40,9 @@ class RgProcessing(BaseProcessing):
         query = self.request.query.get('b', '')
         query_lines = await self._decode_base64(query)
         params = dict([(x.partition('=')[0], x.partition('=')[2]) for x in query_lines.splitlines()])
-        campaign = params.get('camp')
-        offer = params.get('id')
-        url = params.get('url')
+        campaign = params.get('c')
+        offer = params.get('o')
+        url = params.get('u')
         ip = self.request.ip
         referer = self.request.referer
         user_agent = self.request.user_agent

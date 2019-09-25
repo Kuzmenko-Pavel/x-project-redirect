@@ -131,3 +131,12 @@ def add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, c
                        )
         except Exception as ex:
             print(ex)
+
+
+@app.task(ignore_result=True)
+def add_x(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, cid):
+    try:
+        dt = parser.parse(click_datetime)
+    except (ValueError, AttributeError, TypeError):
+        dt = datetime.now()
+    print(url, ip, offer, campaign, dt, referer, user_agent, cookie, cid, sep='\n')

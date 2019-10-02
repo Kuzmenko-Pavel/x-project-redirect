@@ -23,3 +23,10 @@ celery:
 debug:
   status: False
   console: False
+
+mongo:
+  uri: mongodb://srv-2.yottos.com:27017/getmyad_log?maxPoolSize=200&w=0
+  db: adv_log
+  collection:
+    click: log.click
+    blacklist: blacklist

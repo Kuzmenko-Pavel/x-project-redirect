@@ -1,13 +1,16 @@
-from datetime import datetime
-from dateutil import parser
-from uuid import UUID, uuid4
-from x_project_redirect.celery_worker.mq import MQ
 import pyodbc
+from datetime import datetime
+from uuid import UUID
+
+from dateutil import parser
+
 from x_project_redirect.celery_worker import app
+from x_project_redirect.celery_worker.mq import MQ
 
 
 def mssql_connection_adload():
-    return pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=srv-3.yottos.com;DATABASE=Adload;UID=web;PWD=odif8duuisdofj')
+    return pyodbc.connect(
+        'DRIVER={ODBC Driver 13 for SQL Server};SERVER=srv-3.yottos.com;DATABASE=Adload;UID=web;PWD=odif8duuisdofj')
 
 
 def add_click(offer_id, campaign_id, click_datetime=None, social=None, cost_percent_click=None):
@@ -134,9 +137,11 @@ def add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, c
 
 
 @app.task(ignore_result=True)
-def add_x(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, cid):
+def add_x(id_block, id_site, id_account_right, id_offer, id_campaign, id_account_left,
+          clicks_cost_right, clicks_cost_left, social, token, clicks_time, valid,
+          test, dt, url, ip, referer, user_agent, cookie, cid):
     try:
-        dt = parser.parse(click_datetime)
+        dt = parser.parse(dt)
     except (ValueError, AttributeError, TypeError):
         dt = datetime.now()
-    print(url, ip, offer, campaign, dt, referer, user_agent, cookie, cid, sep='\n')
+

@@ -31,7 +31,8 @@ install_requires = ['aiohttp',
                     'python-dateutil',
                     'pyodbc',
                     'ua-parser>=0.4.1',
-                    'amqplib==1.0.2'
+                    'amqplib==1.0.2',
+                    'pymongo',
                     ]
 
 setup(

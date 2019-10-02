@@ -9,6 +9,16 @@ TRAFARET_CONF = T.Dict({
     T.Key('host'): T.Regexp(primitive_ip_regexp),
     T.Key('port'): T.Int(),
     T.Key('celery'): T.Any(),
+    T.Key('mongo'):
+        T.Dict({
+            'uri': T.String(),
+            'db': T.String(),
+            T.Key('collection'):
+                T.Dict({
+                    'click': T.String(),
+                    'blacklist': T.String(),
+                })
+        }),
     T.Key('debug'): T.Dict({
         T.Key('status', default=False): T.Bool(),
         T.Key('console', default=False): T.Bool(),

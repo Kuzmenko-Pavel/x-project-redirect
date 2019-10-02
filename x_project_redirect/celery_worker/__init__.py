@@ -2,6 +2,7 @@ from celery import Celery, signals
 import os.path
 import sys
 import yaml
+from pymongo import errors, MongoClient
 
 from trafaret_config.simple import read_and_validate
 
@@ -74,10 +75,53 @@ def get_celery_configuration(config):
     return config_dict
 
 
+def get_mongo_configuration(config):
+    config_dict = {}
+    for key, value in config.get('mongo', {}).items():
+        config_dict[key] = value
+    return config_dict
+
+def mongo_connection(host):
+    u"""Возвращает Connection к серверу MongoDB"""
+    try:
+        connection = MongoClient(host=host, maxPoolSize=20)
+    except errors.AutoReconnect:
+        from time import sleep
+        sleep(1)
+        connection = MongoClient(host=host, maxPoolSize=20)
+    return connection
+
+
+def check_collection(connection, config):
+    avg_obj_size = 500
+    max_obj = 5000000
+    collection = config['collection']
+    collection_name = [x for x in collection.values()]
+    db = connection[config['db']]
+    for name in collection_name:
+        options = db[name].options()
+        if not options.get('capped', False):
+            db.drop_collection(name)
+            db.create_collection(name, size=max_obj * avg_obj_size, capped=True, max=max_obj)
+            db[name].create_index('dt', background=True)
+            db[name].create_index('ip', background=True)
+
+
 def init_celery(config):
     global app
     celery_config = get_celery_configuration(config)
     app.config_from_object(celery_config)
+    app.mongo_config = get_mongo_configuration(config)
+    app.mongo_connection = mongo_connection(app.mongo_config['uri'])
+    check_collection(app.mongo_connection, app.mongo_config)
+
+
+@signals.task_prerun.connect
+def prerun_task(task_id, task, *args, **kwargs):
+    task.db = task._app.mongo_connection[task._app.mongo_config['db']]
+    task.collection_click = task.db[task._app.mongo_config['collection']['click']]
+    task.collection_blacklist = task.db[task._app.mongo_config['collection']['blacklist']]
+
 
 load()
 

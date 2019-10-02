@@ -19,6 +19,7 @@ class BaseProcessing:
     utm_term = 'yottos'
     utm_rand = str(random.randint(0, 1000000))
     cid = str(uuid4())
+    bad_user = None
 
     makros = ['{source}', '{source_id}', '{source_guid}', '{campaign}', '{campaign_id}', '{campaign_guid}', '{name}',
               '{offer}', '{offer_id}', '{offer_guid}', '{rand}']
@@ -105,6 +106,10 @@ class BaseProcessing:
             query = dict(parse_qsl(url_parts[4]))
             if 'yt_cid' not in query:
                 query.update({'yt_cid': self.cid})
+            if self.bad_user is None:
+                query.update({'yt_u_g': 't'})
+            else:
+                query.update({'yt_u_b': self.bad_user})
             if len(query) > 0:
                 url_parts[4] = await self.__add_makros(query, values)
             url = urlunparse(url_parts)

@@ -39,7 +39,6 @@ class RgProcessing(BaseProcessing):
         return key in params
 
     async def redirect(self):
-        bad_user = None
         query = self.request.query.get('b', '')
         query_lines = await self._decode_base64(query)
         params = dict([(x.partition('=')[0], x.partition('=')[2]) for x in query_lines.splitlines()])
@@ -63,13 +62,13 @@ class RgProcessing(BaseProcessing):
         referer = self.request.referer
         user_agent = self.request.user_agent
         if not valid:
-            bad_user = 'token'
+            self.bad_user = 'token'
         if self.request.bot:
-            bad_user = 'bt'
+            self.bad_user = 'bt'
             valid = False
         if referer != '' and 'yottos.com' not in referer:
             logger.warning("!!!!!!! FAKE REFERER !!!!!!!!!")
-            bad_user = 'referer'
+            self.bad_user = 'referer'
             valid = False
         if all([x is not None for x in [id_block, id_site, id_account_right,
                                         id_offer, id_campaign, id_account_left, url]]):

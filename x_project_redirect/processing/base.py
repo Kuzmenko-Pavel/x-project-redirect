@@ -160,6 +160,16 @@ class BaseProcessing:
             logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
         return val
 
+    def encrypt_decrypt(self, word, ip):
+        key = list(ip)
+        output = []
+
+        for i in range(len(word)):
+            xor_num = ord(word[i]) ^ ord(key[i % len(key)])
+            output.append(chr(xor_num))
+
+        return ''.join(output)
+
     def http_found(self, url):
         return HTTPFound(url)
 

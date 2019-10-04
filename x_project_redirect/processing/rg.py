@@ -57,6 +57,8 @@ class RgProcessing(BaseProcessing):
         social = bool(int(params.get('s', 0)))
         token = params.get('to', '')
         url = params.get('u')
+        not_filter = bool(int(params.get('f', 0)))
+        time_filter = params.get('tf', 60)
         clicks_time = (int(time.time() * 1000) - int(params.get('tr', int(time.time() * 1000)))) / 1000
         valid = True if self.encrypt_decrypt(params.get('ra', ''), ip) == "valid" else False
         referer = self.request.referer
@@ -77,14 +79,14 @@ class RgProcessing(BaseProcessing):
                 add_x.delay(id_block, id_site, id_account_right,
                             id_offer, id_campaign, id_account_left,
                             clicks_cost_right, clicks_cost_left,
-                            social, token, clicks_time, valid,
+                            social, token, clicks_time, valid, not_filter, time_filter,
                             test, dt, url, ip, referer, user_agent, cookie, self.cid)
             except Exception as ex:
                 logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
                 add_x(id_block, id_site, id_account_right,
                       id_offer, id_campaign, id_account_left,
                       clicks_cost_right, clicks_cost_left,
-                      social, token, clicks_time, valid,
+                      social, token, clicks_time, valid, not_filter, time_filter,
                       test, dt, url, ip, referer, user_agent, cookie, self.cid)
         else:
             url = 'https://yottos.com'

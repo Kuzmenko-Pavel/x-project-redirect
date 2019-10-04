@@ -92,11 +92,12 @@ def mongo_connection(host):
     return connection
 
 
-def check_collection(connection, config):
+def check_collection(config):
     avg_obj_size = 500
     max_obj = 5000000
     collection = config['collection']
     collection_name = [x for x in collection.values()]
+    connection = mongo_connection(config['uri'])
     db = connection[config['db']]
     for name in collection_name:
         options = db[name].options()
@@ -112,13 +113,13 @@ def init_celery(config):
     celery_config = get_celery_configuration(config)
     app.config_from_object(celery_config)
     app.mongo_config = get_mongo_configuration(config)
-    app.mongo_connection = mongo_connection(app.mongo_config['uri'])
-    check_collection(app.mongo_connection, app.mongo_config)
+    check_collection(app.mongo_config)
 
 
 @signals.task_prerun.connect
 def prerun_task(task_id, task, *args, **kwargs):
-    task.db = task._app.mongo_connection[task._app.mongo_config['db']]
+    task.mongo_connection = mongo_connection(task._app.mongo_config['uri'])
+    task.db = task.mongo_connection[task._app.mongo_config['db']]
     task.collection_click = task.db[task._app.mongo_config['collection']['click']]
     task.collection_blacklist = task.db[task._app.mongo_config['collection']['blacklist']]
 

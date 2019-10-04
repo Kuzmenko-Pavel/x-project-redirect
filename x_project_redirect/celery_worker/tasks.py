@@ -136,12 +136,35 @@ def add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, c
             print(ex)
 
 
-@app.task(ignore_result=True)
-def add_x(id_block, id_site, id_account_right, id_offer, id_campaign, id_account_left,
-          clicks_cost_right, clicks_cost_left, social, token, clicks_time, valid,
+@app.task(ignore_result=True, bind=True)
+def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_account_left,
+          clicks_cost_right, clicks_cost_left, social, token, clicks_time, valid, not_filter, time_filter,
           test, dt, url, ip, referer, user_agent, cookie, cid):
     try:
         dt = parser.parse(dt)
     except (ValueError, AttributeError, TypeError):
         dt = datetime.now()
 
+    click_obj = {
+        "id_account_right": id_account_right,
+        "id_site": id_site,
+        "clicks_cost_right": clicks_cost_right,
+        "id_block": id_block,
+        "clicks_cost_left": clicks_cost_left,
+        "token": token,
+        "id_campaign": id_campaign,
+        "test": test,
+        "clicks_time": clicks_time,
+        "valid": valid,
+        "cookie": cookie,
+        "social": social,
+        "id_offer": id_offer,
+        "dt": dt,
+        "ip": ip,
+        "id_account_left": id_account_left,
+        "referer": referer,
+        "user_agent": user_agent,
+        "url": url,
+        "cid": cid
+    }
+    self.collection_click.insert_one(click_obj)

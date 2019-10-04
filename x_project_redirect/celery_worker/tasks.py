@@ -100,14 +100,16 @@ def get_account(offer_id, campaign_id):
     return account_id
 
 
-def blacklist_exist(blacklist, ip):
-    if blacklist.ip.find_one({'ip': ip}):
-        blacklist.ip.update_one({'ip': ip}, {'$set': {'dt': datetime.datetime.now()}}, upsert=True)
+def blacklist_exist(blacklist, ip, cookie):
+    if blacklist.find({'ip': ip, 'cookie': cookie}).count() > 1:
+        blacklist.update_many({'ip': ip, 'cookie': cookie}, {'$set': {'dt': datetime.now()}}, upsert=True)
+        return True
+    if blacklist.find({'ip': ip}).count() > 3:
         return True
     return False
 
 
-def check_filter(clicks, blacklist, ip, cookie, block_id, offer_id, dt):
+def check_filter(clicks, blacklist, ip, cookie, id_block, id_offer, dt):
     # Ищем, не было ли кликов по этому товару
     # Заодно проверяем ограничение на max_clicks_for_one_day переходов в сутки
     # (защита от накруток)
@@ -140,12 +142,12 @@ def check_filter(clicks, blacklist, ip, cookie, block_id, offer_id, dt):
 
     cursor = clicks.find({
         'ip': ip,
-        'inf': block_id,
+        'id_block': id_block,
         'dt': {'$lte': dt, '$gte': (dt - timedelta(weeks=1))}
     }).limit(ip_max_clicks_for_one_day_all + ip_max_clicks_for_one_week_all)
 
     for click in cursor:
-        if click.get('inf') == block_id:
+        if click.get('id_block') == id_block:
             if click.get('cookie') == cookie:
                 if (dt - click['dt']).days == 0:
                     today_clicks += 1
@@ -153,7 +155,7 @@ def check_filter(clicks, blacklist, ip, cookie, block_id, offer_id, dt):
                 else:
                     toweek_clicks += 1
 
-                if click['offer'] == offer_id:
+                if click['id_offer'] == id_offer:
                     unique = False
             else:
                 if (dt - click['dt']).days == 0:
@@ -169,7 +171,7 @@ def check_filter(clicks, blacklist, ip, cookie, block_id, offer_id, dt):
                 else:
                     toweek_clicks_all += 1
 
-                if click['offer'] == offer_id:
+                if click['id_offer'] == id_offer:
                     unique = False
             else:
                 if (dt - click['dt']).days == 0:
@@ -180,75 +182,67 @@ def check_filter(clicks, blacklist, ip, cookie, block_id, offer_id, dt):
 
     print("Total clicks for day in informers = %s" % today_clicks)
     if today_clicks >= max_clicks_for_one_day:
-        error_id = 3
         print(u'Более %d переходов с РБ за сутки' % max_clicks_for_one_day)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for week in informers = %s" % toweek_clicks)
     if toweek_clicks >= max_clicks_for_one_week:
-        error_id = 4
         print(u'Более %d переходов с РБ за неделю' % max_clicks_for_one_week)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for day in all partners = %s" % today_clicks_all)
     if today_clicks_all >= max_clicks_for_one_day_all:
-        error_id = 5
         print(u'Более %d переходов с ПС за сутки' % max_clicks_for_one_day_all)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for week in all partners = %s" % toweek_clicks_all)
     if toweek_clicks_all >= max_clicks_for_one_week_all:
-        error_id = 6
         print(u'Более %d переходов с ПС за неделю' % max_clicks_for_one_week_all)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for day in informers by ip = %s" % today_clicks)
     if ip_today_clicks >= ip_max_clicks_for_one_day:
-        error_id = 3
         print(u'Более %d переходов с РБ за сутки по ip' % ip_max_clicks_for_one_day)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for week in informers by ip = %s" % toweek_clicks)
     if ip_toweek_clicks >= ip_max_clicks_for_one_week:
-        error_id = 4
         print(u'Более %d переходов с РБ за неделю по ip' % ip_max_clicks_for_one_week)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for day in all partners by ip = %s" % today_clicks_all)
     if ip_today_clicks_all >= ip_max_clicks_for_one_day_all:
-        error_id = 5
         print(u'Более %d переходов с ПС за сутки по ip' % ip_max_clicks_for_one_day_all)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     print("Total clicks for week in all partners by ip = %s" % toweek_clicks_all)
     if ip_toweek_clicks_all >= ip_max_clicks_for_one_week_all:
-        error_id = 6
         print(u'Более %d переходов с ПС за неделю по ip' % ip_max_clicks_for_one_week_all)
         unique = False
-        blacklist.ip.update_one({'ip': ip},
-                                {'$set': {'dt': datetime.datetime.now()}},
-                                upsert=True)
+        blacklist.update_one({'ip': ip, 'cookie': cookie},
+                             {'$set': {'dt': datetime.now()}},
+                             upsert=True)
 
     return unique
 
@@ -294,9 +288,135 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
           clicks_cost_right, clicks_cost_left, social, token, clicks_time, valid, not_filter, time_filter,
           test, dt, url, ip, referer, user_agent, cookie, cid):
     try:
+        print("Block ID = %s" % id_block)
+    except Exception:
+        pass
+    try:
+        print("Site ID = %s" % id_site)
+    except Exception:
+        pass
+    try:
+        print("Getmyad ID = %s" % id_account_right)
+    except Exception:
+        pass
+    try:
+        print("Offer ID = %s" % id_offer)
+    except Exception:
+        pass
+    try:
+        print("Campaign ID = %s" % id_campaign)
+    except Exception:
+        pass
+    try:
+        print("Adload ID = %s" % id_account_left)
+    except Exception:
+        pass
+    try:
+        print("Getmyad Click Cost = %s" % clicks_cost_right)
+    except Exception:
+        pass
+    try:
+        print("Adload Click Cost = %s" % clicks_cost_left)
+    except Exception:
+        pass
+    try:
+        print("Social = %s" % social)
+    except Exception:
+        pass
+    try:
+        print("Token = %s" % token)
+    except Exception:
+        pass
+    try:
+        print("Click Time = %s" % clicks_time)
+    except Exception:
+        pass
+    try:
+        print("Valid = %s" % valid)
+    except Exception:
+        pass
+    try:
+        print("Not Filter = %s" % not_filter)
+    except Exception:
+        pass
+    try:
+        print("Time Filter = %s" % time_filter)
+    except Exception:
+        pass
+    try:
+        print("Test = %s" % test)
+    except Exception:
+        pass
+    try:
+        print("Date = %s" % dt)
+    except Exception:
+        pass
+    try:
+        print("Url = %s" % url)
+    except Exception:
+        pass
+    try:
+        print("IP = %s" % ip)
+    except Exception:
+        pass
+    try:
+        print("Referer = %s" % referer)
+    except Exception:
+        pass
+    try:
+        print("User Agent = %s" % user_agent)
+    except Exception:
+        pass
+    try:
+        print("Cookie = %s" % cookie)
+    except Exception:
+        pass
+    try:
+        print("CID = %s" % cid)
+    except Exception:
+        pass
+
+    unique = True
+    suspicious = False
+    filtered = False
+    banned = False
+    try:
         dt = parser.parse(dt)
     except (ValueError, AttributeError, TypeError):
         dt = datetime.now()
+
+    if test:
+        print("Processed test click from ip %s" % ip)
+        return
+
+    if not not_filter:
+        if not valid:
+            print("NOT VALID ip:%s" % ip)
+            banned = True
+            unique = False
+        else:
+            if blacklist_exist(self.collection_blacklist, ip, cookie):
+                print("Blacklisted ip:%s" % ip)
+                banned = True
+                valid = False
+                unique = False
+
+            if int(clicks_time) < int(time_filter):
+                filtered = False
+                unique = False
+                valid = False
+
+            if valid:
+                if referer is None:
+                    print('Without Referer ip:%s' % ip)
+                    suspicious = True
+
+                if user_agent is None:
+                    print('Without User Agent ip:%s' % ip)
+                    suspicious = True
+
+                unique = check_filter(self.collection_click, self.collection_blacklist,
+                                      ip, cookie, id_block, id_offer, dt)
 
     click_obj = {
         "id_account_right": id_account_right,
@@ -306,7 +426,6 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
         "clicks_cost_left": clicks_cost_left,
         "token": token,
         "id_campaign": id_campaign,
-        "test": test,
         "clicks_time": clicks_time,
         "valid": valid,
         "cookie": cookie,
@@ -318,6 +437,11 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
         "referer": referer,
         "user_agent": user_agent,
         "url": url,
-        "cid": cid
+        "cid": cid,
+        "unique": unique,
+        "suspicious": suspicious,
+        "filtered": filtered,
+        "banned": banned
+
     }
     self.collection_click.insert_one(click_obj)

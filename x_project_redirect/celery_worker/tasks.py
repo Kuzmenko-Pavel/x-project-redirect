@@ -1,5 +1,5 @@
 import pyodbc
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from dateutil import parser
@@ -98,6 +98,159 @@ def get_account(offer_id, campaign_id):
         print(ex)
     print(account_id)
     return account_id
+
+
+def blacklist_exist(blacklist, ip):
+    if blacklist.ip.find_one({'ip': ip}):
+        blacklist.ip.update_one({'ip': ip}, {'$set': {'dt': datetime.datetime.now()}}, upsert=True)
+        return True
+    return False
+
+
+def check_filter(clicks, blacklist, ip, cookie, block_id, offer_id, dt):
+    # Ищем, не было ли кликов по этому товару
+    # Заодно проверяем ограничение на max_clicks_for_one_day переходов в сутки
+    # (защита от накруток)
+    max_clicks_for_one_day = 3
+    max_clicks_for_one_day_all = 5
+    max_clicks_for_one_week = 10
+    max_clicks_for_one_week_all = 15
+    ip_max_clicks_for_one_day = 6
+    ip_max_clicks_for_one_day_all = 10
+    ip_max_clicks_for_one_week = 20
+    ip_max_clicks_for_one_week_all = 30
+
+    # Проверяе по рекламному блоку за день и неделю
+    today_clicks = 0
+    toweek_clicks = 0
+
+    # Проверяе по ПС за день и неделю
+    today_clicks_all = 0
+    toweek_clicks_all = 0
+
+    # Проверяе по рекламному блоку за день и неделю по ip
+    ip_today_clicks = 0
+    ip_toweek_clicks = 0
+
+    # Проверяе по ПС за день и неделю по ip
+    ip_today_clicks_all = 0
+    ip_toweek_clicks_all = 0
+
+    unique = True
+
+    cursor = clicks.find({
+        'ip': ip,
+        'inf': block_id,
+        'dt': {'$lte': dt, '$gte': (dt - timedelta(weeks=1))}
+    }).limit(ip_max_clicks_for_one_day_all + ip_max_clicks_for_one_week_all)
+
+    for click in cursor:
+        if click.get('inf') == block_id:
+            if click.get('cookie') == cookie:
+                if (dt - click['dt']).days == 0:
+                    today_clicks += 1
+                    toweek_clicks += 1
+                else:
+                    toweek_clicks += 1
+
+                if click['offer'] == offer_id:
+                    unique = False
+            else:
+                if (dt - click['dt']).days == 0:
+                    ip_today_clicks += 1
+                    ip_toweek_clicks += 1
+                else:
+                    ip_toweek_clicks += 1
+        else:
+            if click.get('cookie') == cookie:
+                if (dt - click['dt']).days == 0:
+                    today_clicks_all += 1
+                    toweek_clicks_all += 1
+                else:
+                    toweek_clicks_all += 1
+
+                if click['offer'] == offer_id:
+                    unique = False
+            else:
+                if (dt - click['dt']).days == 0:
+                    ip_today_clicks_all += 1
+                    ip_toweek_clicks_all += 1
+                else:
+                    ip_toweek_clicks_all += 1
+
+    print("Total clicks for day in informers = %s" % today_clicks)
+    if today_clicks >= max_clicks_for_one_day:
+        error_id = 3
+        print(u'Более %d переходов с РБ за сутки' % max_clicks_for_one_day)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for week in informers = %s" % toweek_clicks)
+    if toweek_clicks >= max_clicks_for_one_week:
+        error_id = 4
+        print(u'Более %d переходов с РБ за неделю' % max_clicks_for_one_week)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for day in all partners = %s" % today_clicks_all)
+    if today_clicks_all >= max_clicks_for_one_day_all:
+        error_id = 5
+        print(u'Более %d переходов с ПС за сутки' % max_clicks_for_one_day_all)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for week in all partners = %s" % toweek_clicks_all)
+    if toweek_clicks_all >= max_clicks_for_one_week_all:
+        error_id = 6
+        print(u'Более %d переходов с ПС за неделю' % max_clicks_for_one_week_all)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for day in informers by ip = %s" % today_clicks)
+    if ip_today_clicks >= ip_max_clicks_for_one_day:
+        error_id = 3
+        print(u'Более %d переходов с РБ за сутки по ip' % ip_max_clicks_for_one_day)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for week in informers by ip = %s" % toweek_clicks)
+    if ip_toweek_clicks >= ip_max_clicks_for_one_week:
+        error_id = 4
+        print(u'Более %d переходов с РБ за неделю по ip' % ip_max_clicks_for_one_week)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for day in all partners by ip = %s" % today_clicks_all)
+    if ip_today_clicks_all >= ip_max_clicks_for_one_day_all:
+        error_id = 5
+        print(u'Более %d переходов с ПС за сутки по ip' % ip_max_clicks_for_one_day_all)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    print("Total clicks for week in all partners by ip = %s" % toweek_clicks_all)
+    if ip_toweek_clicks_all >= ip_max_clicks_for_one_week_all:
+        error_id = 6
+        print(u'Более %d переходов с ПС за неделю по ip' % ip_max_clicks_for_one_week_all)
+        unique = False
+        blacklist.ip.update_one({'ip': ip},
+                                {'$set': {'dt': datetime.datetime.now()}},
+                                upsert=True)
+
+    return unique
 
 
 @app.task(ignore_result=True)

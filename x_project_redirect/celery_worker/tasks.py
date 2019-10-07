@@ -457,3 +457,10 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
     }
     self.collection_click.insert_one(click_obj)
     print('===============Stop X Click===============')
+
+
+@app.task(ignore_result=True, bind=True)
+def clean_blacklist(self):
+    print(self.collection_blacklist.ip.remove({
+        'dt': {'$lte': datetime.now() - timedelta(weeks=2)}
+    }))

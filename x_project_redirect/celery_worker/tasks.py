@@ -101,10 +101,14 @@ def get_account(offer_id, campaign_id):
 
 
 def blacklist_exist(blacklist, ip, cookie):
-    if blacklist.find({'ip': ip, 'cookie': cookie}).count() > 1:
+    cookie_count = blacklist.find({'ip': ip, 'cookie': cookie}).count()
+    print('Check blacklist by cookie %s' % cookie_count)
+    if cookie_count >= 1:
         blacklist.update_many({'ip': ip, 'cookie': cookie}, {'$set': {'dt': datetime.now()}}, upsert=True)
         return True
-    if blacklist.find({'ip': ip}).count() > 3:
+    ip_count = blacklist.find({'ip': ip}).count()
+    print('Check blacklist by ip %s' % ip_count)
+    if ip_count > 3:
         return True
     return False
 
@@ -287,6 +291,7 @@ def add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, c
 def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_account_left,
           clicks_cost_right, clicks_cost_left, social, token, clicks_time, valid, not_filter, time_filter,
           test, dt, url, ip, referer, user_agent, cookie, cid):
+    print('===============Start X Click===============')
     try:
         print("Block ID = %s" % id_block)
     except Exception:
@@ -402,6 +407,7 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
                 unique = False
 
             if int(clicks_time) < int(time_filter):
+                print("Filtered time by ip:%s" % ip)
                 filtered = False
                 unique = False
                 valid = False
@@ -417,6 +423,11 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
 
                 unique = check_filter(self.collection_click, self.collection_blacklist,
                                       ip, cookie, id_block, id_offer, dt)
+                print('Unique:%s' % unique)
+    if not unique or not valid or banned:
+        print('Reset click cost')
+        clicks_cost_right = 0
+        clicks_cost_left = 0
 
     click_obj = {
         "id_account_right": id_account_right,
@@ -445,3 +456,4 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
 
     }
     self.collection_click.insert_one(click_obj)
+    print('===============Stop X Click===============')

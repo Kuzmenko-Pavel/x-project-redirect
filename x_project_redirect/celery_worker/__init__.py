@@ -95,13 +95,14 @@ def mongo_connection(host):
 def check_collection(config):
     avg_obj_size = 500
     max_obj = 5000000
-    collection = config['collection']
+    collection = {'click': 'log.click'}#config['collection']
     collection_name = [x for x in collection.values()]
     connection = mongo_connection(config['uri'])
     db = connection[config['db']]
     for name in collection_name:
         options = db[name].options()
         if not options.get('capped', False):
+            print('Create collection %s' % name)
             db.drop_collection(name)
             db.create_collection(name, size=max_obj * avg_obj_size, capped=True, max=max_obj)
             db[name].create_index('dt', background=True)

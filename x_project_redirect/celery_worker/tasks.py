@@ -394,6 +394,9 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
         print("Processed test click from ip %s" % ip)
         return
 
+    if ip == '178.165.81.178':
+        not_filter = True
+
     if not not_filter:
         if not valid:
             print("NOT VALID ip:%s" % ip)

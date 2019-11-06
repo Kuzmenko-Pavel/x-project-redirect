@@ -45,19 +45,22 @@ class BaseProcessing:
     async def redirect(self):
         return HTTPNotImplemented()
 
-    async def get_utm_source(self, offer, campaign, *args, **kwargs):
+    async def get_utm_source(self, *args, **kwargs):
         return self.utm_source
 
-    async def get_utm_campaign(self, offer, campaign, *args, **kwargs):
+    async def get_utm_campaign(self, *args, **kwargs):
         return self.utm_campaign
 
-    async def get_utm_medium(self, offer, campaign, *args, **kwargs):
+    async def get_utm_medium(self, *args, **kwargs):
         return self.utm_medium
 
-    async def get_utm_term(self, offer, campaign, *args, **kwargs):
+    async def get_utm_content(self, *args, **kwargs):
+        return self.utm_medium
+
+    async def get_utm_term(self, *args, **kwargs):
         return self.utm_term
 
-    async def get_utm_rand(self, offer, campaign, *args, **kwargs):
+    async def get_utm_rand(self, *args, **kwargs):
         return self.utm_rand
 
     async def get_default_utm(self, name):
@@ -79,25 +82,25 @@ class BaseProcessing:
                 params[key] = value
         return urlencode(params)
 
-    async def get_makros_values(self, offer, campaign):
+    async def get_makros_values(self, *args, **kwargs):
         return {
-                '{source}': await self.get_utm_source(offer, campaign),
-                '{campaign}': await self.get_utm_campaign(offer, campaign),
-                '{medium}': await self.get_utm_medium(offer, campaign)
+                '{source}': await self.get_utm_source(*args, **kwargs),
+                '{campaign}': await self.get_utm_campaign(*args, **kwargs),
+                '{medium}': await self.get_utm_medium(*args, **kwargs)
             }
 
-    async def get_utm_keys(self, offer, campaign):
+    async def get_utm_keys(self, *args, **kwargs):
         return {
-                'utm_medium': await self.get_utm_medium(offer, campaign),
-                'utm_source': await self.get_utm_source(offer, campaign),
-                'utm_campaign': await self.get_utm_campaign(offer, campaign),
-                'utm_content': await self.get_utm_medium(offer, campaign),
-                'utm_term': await self.get_utm_term(offer, campaign),
+                'utm_medium': await self.get_utm_medium(*args, **kwargs),
+                'utm_source': await self.get_utm_source(*args, **kwargs),
+                'utm_campaign': await self.get_utm_campaign(*args, **kwargs),
+                'utm_content': await self.get_utm_content(*args, **kwargs),
+                'utm_term': await self.get_utm_term(*args, **kwargs),
             }
 
-    async def __add_dynamic_param(self, url, offer, campaign):
+    async def __add_dynamic_param(self, url, *args, **kwargs):
         try:
-            values = await self.get_makros_values(offer, campaign)
+            values = await self.get_makros_values(*args, **kwargs)
             url_parts = list(urlparse(url))
             params = dict(parse_qsl(url_parts[3]))
             if len(params) > 0:
@@ -117,25 +120,24 @@ class BaseProcessing:
             print(e)
         return url
 
-    async def __add_utm_param(self, url, offer, campaign):
+    async def __add_utm_param(self, url, *args, **kwargs):
         try:
-            keys = await self.get_utm_keys(offer, campaign)
+            keys = await self.get_utm_keys(*args, **kwargs)
             url_parts = list(urlparse(url))
             params = dict(parse_qsl(url_parts[3]))
             if len(params) > 0:
                 url_parts[3] = await self.__add_utm(params, keys)
 
             query = dict(parse_qsl(url_parts[4]))
-            if len(query) > 0:
-                url_parts[4] = await self.__add_utm(query, keys)
+            url_parts[4] = await self.__add_utm(query, keys)
             url = urlunparse(url_parts)
         except Exception as e:
             print(e)
         return url
 
-    async def utm_converter(self, url, offer, campaign):
-        url = await self.__add_dynamic_param(url, offer, campaign)
-        return await self.__add_utm_param(url, offer, campaign)
+    async def utm_converter(self, url, *args, **kwargs):
+        url = await self.__add_dynamic_param(url, *args, **kwargs)
+        return await self.__add_utm_param(url, *args, **kwargs)
 
     async def _decode_base64(self, data, recursion=None):
         val = ''

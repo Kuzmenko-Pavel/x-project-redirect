@@ -7,6 +7,7 @@ from x_project_redirect.logger import logger, exception_message
 class FbProcessing(BaseProcessing):
     source = 'fb'
     utm_medium = 'cpcf'
+    utm_content = 'cpcf'
 
     async def click(self):
         query = self.request.query_string
@@ -50,7 +51,7 @@ class FbProcessing(BaseProcessing):
         cookie = self.request.user_cookie
         click_datetime = datetime.now()
         if campaign and offer and url:
-            url = await self.utm_converter(url, offer, campaign)
+            url = await self.utm_converter(url, offer=offer, campaign=campaign)
             if not self.request.bot:
                 try:
                     add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, self.cid)

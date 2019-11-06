@@ -8,6 +8,9 @@ from .base import BaseProcessing
 
 class RgProcessing(BaseProcessing):
     source = 'rg'
+    utm_medium = 'cpc_yottos'
+    utm_source = 'rg_yottos'
+    utm_default = 'rg'
 
     async def click(self):
         query = self.request.query_string
@@ -33,10 +36,29 @@ class RgProcessing(BaseProcessing):
             return self.http_js_found(location)
         return self.http_found(location)
 
-    def utm_exist(self, key, params):
-        if key == 'utm_medium':
-            return False
-        return key in params
+    async def get_utm_source(self, *args, **kwargs):
+        block = kwargs.get('block')
+        if block:
+            return block
+        return self.utm_source
+
+    async def get_utm_campaign(self, *args, **kwargs):
+        campaign = kwargs.get('campaign')
+        if campaign:
+            return campaign
+        return self.utm_campaign
+
+    async def get_utm_content(self, *args, **kwargs):
+        offer = kwargs.get('offer')
+        if offer:
+            return offer
+        return self.utm_medium
+
+    async def get_utm_term(self, *args, **kwargs):
+        block = kwargs.get('block')
+        if block:
+            return block
+        return self.utm_term
 
     async def redirect(self):
         query = self.request.query.get('b', '')
@@ -74,7 +96,7 @@ class RgProcessing(BaseProcessing):
             valid = False
         if all([x is not None for x in [id_block, id_site, id_account_right,
                                         id_offer, id_campaign, id_account_left, url]]):
-            url = await self.utm_converter(url, id_offer, id_campaign)
+            url = await self.utm_converter(url, offer=id_offer, campaign=id_campaign, block=id_block)
             try:
                 add_x.delay(id_block, id_site, id_account_right,
                             id_offer, id_campaign, id_account_left,

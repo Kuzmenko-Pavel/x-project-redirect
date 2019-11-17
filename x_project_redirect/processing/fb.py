@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 from .base import BaseProcessing
 from x_project_redirect.celery_worker.tasks import add
 from x_project_redirect.logger import logger, exception_message
@@ -42,24 +43,52 @@ class FbProcessing(BaseProcessing):
         query = self.request.query.get('b', '')
         query_lines = await self._decode_base64(query)
         params = dict([(x.partition('=')[0], x.partition('=')[2]) for x in query_lines.splitlines()])
-        campaign = params.get('camp')
-        offer = params.get('id')
-        url = params.get('url')
+        dt = datetime.now()
         ip = self.request.ip
+        cookie = self.request.user_cookie
+        id_block = params.get('bid')
+        id_site = params.get('sid')
+        id_account_right = params.get('aidr')
+        id_offer = params.get('oid')
+        id_campaign = params.get('cid')
+        id_account_left = params.get('aidl')
+        test = bool(int(params.get('t', 0)))
+        clicks_cost_right = float(params.get('ccr', 0))
+        clicks_cost_left = float(params.get('ccl', 0))
+        social = bool(int(params.get('s', 0)))
+        token = params.get('to', '')
+        url = params.get('u')
+        not_filter = bool(int(params.get('f', 0)))
+        time_filter = params.get('tf', 60)
+        clicks_time = (int(time.time() * 1000) - int(params.get('tr', int(time.time() * 1000)))) / 1000
+        valid = True if self.encrypt_decrypt(params.get('ra', ''), ip) == "valid" else False
         referer = self.request.referer
         user_agent = self.request.user_agent
-        cookie = self.request.user_cookie
-        click_datetime = datetime.now()
-        if campaign and offer and url:
-            url = await self.utm_converter(url, offer=offer, campaign=campaign)
-            if not self.request.bot:
-                try:
-                    add.delay(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, self.cid)
-                except Exception as ex:
-                    logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
-                    add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, self.cid)
-            else:
-                logger.warning(exception_message(exc='BOT SEND TO URL', request=str(self.request.message)))
+        if not valid:
+            self.bad_user = 'token'
+        if self.request.bot:
+            self.bad_user = 'bt'
+            valid = False
+        if referer != '' and 'yottos.com' not in referer:
+            logger.warning("!!!!!!! FAKE REFERER !!!!!!!!!")
+            self.bad_user = 'referer'
+            valid = False
+        if all([x is not None for x in [id_block, id_site, id_account_right,
+                                        id_offer, id_campaign, id_account_left, url]]):
+            url = await self.utm_converter(url, offer=id_offer, campaign=id_campaign, block=id_block)
+            try:
+                add.delay(id_block, id_site, id_account_right,
+                            id_offer, id_campaign, id_account_left,
+                            clicks_cost_right, clicks_cost_left,
+                            social, token, clicks_time, valid, not_filter, time_filter,
+                            test, dt, url, ip, referer, user_agent, cookie, self.cid)
+            except Exception as ex:
+                logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
+                add(id_block, id_site, id_account_right,
+                            id_offer, id_campaign, id_account_left,
+                            clicks_cost_right, clicks_cost_left,
+                            social, token, clicks_time, valid, not_filter, time_filter,
+                            test, dt, url, ip, referer, user_agent, cookie, self.cid)
         else:
             url = 'https://yottos.com'
         return self.http_found(url)

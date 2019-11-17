@@ -33,6 +33,9 @@ install_requires = ['aiohttp',
                     'ua-parser>=0.4.1',
                     'amqplib==1.0.2',
                     'pymongo',
+                    'sqlalchemy',
+                    'psycopg2',
+                    'zope.sqlalchemy==1.1',
                     ]
 
 setup(

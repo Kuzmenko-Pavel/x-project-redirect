@@ -1,12 +1,20 @@
-from celery import Celery, signals
+from celery import Celery, signals, states
 import os.path
+from os import getpid
+import socket
 import sys
 import yaml
 from pymongo import errors, MongoClient
+import transaction
+
+from x_project_redirect.celery_worker.models import get_engine
+from x_project_redirect.celery_worker.models.meta import metadata, DBScopedSession, ParentBase
 
 from trafaret_config.simple import read_and_validate
 
 from x_project_redirect.utils import TRAFARET_CONF
+
+server_name = socket.gethostname()
 
 app = None
 
@@ -81,6 +89,14 @@ def get_mongo_configuration(config):
         config_dict[key] = value
     return config_dict
 
+
+def get_sqlalchemy_configuration(config):
+    config_dict = {}
+    for key, value in config.get('sqlalchemy', {}).items():
+        config_dict[key] = value
+    return config_dict
+
+
 def mongo_connection(host):
     u"""Возвращает Connection к серверу MongoDB"""
     try:
@@ -114,7 +130,19 @@ def init_celery(config):
     celery_config = get_celery_configuration(config)
     app.config_from_object(celery_config)
     app.mongo_config = get_mongo_configuration(config)
+    app.sqlalchemy_config = get_sqlalchemy_configuration(config)
     check_collection(app.mongo_config)
+    application_name = 'Celery Worker on %s pid=%s' % (server_name, getpid())
+    try:
+        if '-Q' in sys.argv:
+            if sys.argv.index('-Q') + 1 < len(sys.argv):
+                application_name = 'Celery Worker %s on %s pid=%s' % (sys.argv[sys.argv.index('-Q') + 1],
+                                                                      server_name, getpid())
+    except Exception:
+        pass
+    engine = get_engine(app.sqlalchemy_config, prefix='', connect_args={"application_name": application_name})
+    ParentBase.metadata.bind = engine
+    DBScopedSession.configure(bind=engine)
 
 
 @signals.task_prerun.connect
@@ -123,7 +151,31 @@ def prerun_task(task_id, task, *args, **kwargs):
     task.db = task.mongo_connection[task._app.mongo_config['db']]
     task.collection_click = task.db[task._app.mongo_config['collection']['click']]
     task.collection_blacklist = task.db[task._app.mongo_config['collection']['blacklist']]
+    task.dbsession = DBScopedSession()
+    transaction.begin()
 
+
+@signals.task_postrun.connect
+def postrun_task(task_id, task, state, *args, **kwargs):
+    try:
+        if state == states.SUCCESS:
+            try:
+                transaction.commit()
+            except Exception as e:
+                print('postrun_task commit', e)
+        elif state == states.FAILURE:
+            try:
+                transaction.abort()
+            except Exception as e:
+                print('postrun_task abort', e)
+        elif state == states.REVOKED:
+            try:
+                transaction.abort()
+            except Exception as e:
+                print('postrun_task abort', e)
+        task.dbsession.close()
+    except Exception as e:
+        print('postrun_task close', e)
 
 load()
 

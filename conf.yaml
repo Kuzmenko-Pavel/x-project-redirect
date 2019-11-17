@@ -32,3 +32,11 @@ mongo:
   collection:
     click: log.click
     blacklist: blacklist
+
+
+sqlalchemy:
+  url: postgresql://x_project:x_project@srv-13.yottos.com:5432/x_project?client_encoding=utf8
+  client_encoding: utf8
+  pool_reset_on_return: commit
+  pool_size: 30
+  max_overflow: 100

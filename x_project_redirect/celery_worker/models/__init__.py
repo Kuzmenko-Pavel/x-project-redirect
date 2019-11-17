@@ -1,28 +1,21 @@
 # -*- coding: UTF-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import socket
+from os import environ, getpid
 
 from sqlalchemy import engine_from_config
-from sqlalchemy.orm import sessionmaker
-from zope.sqlalchemy import register
 
+from .ParentBlocks import ParentBlock
 from .ParentCampaigns import ParentCampaign
 from .ParentOffers import ParentOffer
-from .ParentBlocks import ParentBlock
 from .meta import metadata, DBScopedSession
 
-
-def get_engine(settings, prefix='sqlalchemy.'):
-    return engine_from_config(settings, prefix, echo=False)
+server_name = socket.gethostname()
 
 
-def get_session_factory(engine):
-    factory = sessionmaker()
-    factory.configure(bind=engine)
-    return factory
-
-
-def get_tm_session(session_factory, transaction_manager):
-    dbsession = session_factory()
-    register(dbsession, transaction_manager=transaction_manager)
-    return dbsession
+def get_engine(settings, prefix='main.sqlalchemy.', **kwargs):
+    if 'connect_args' not in kwargs.keys():
+        application_name = 'WebClick %s on %s pid=%s' % (environ.get('project', ''), server_name, getpid())
+        kwargs['connect_args'] = {"application_name": application_name}
+    return engine_from_config(settings, prefix, echo=False, **kwargs)

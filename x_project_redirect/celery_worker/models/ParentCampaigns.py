@@ -6,9 +6,9 @@ __author__ = 'kuzmenko-pavel'
 from sqlalchemy import Column, Integer, BigInteger, String, Boolean, Float
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
 from sqlalchemy_utils import force_auto_coercion, force_instant_defaults, ChoiceType, UUIDType
-from facebook_exporter.models.choiceTypes import CampaignPaymentModel
+from x_project_redirect.celery_worker.models.choiceTypes import CampaignPaymentModel
 
-from facebook_exporter.models.meta import ParentBase
+from x_project_redirect.celery_worker.models.meta import ParentBase
 
 force_auto_coercion()
 force_instant_defaults()

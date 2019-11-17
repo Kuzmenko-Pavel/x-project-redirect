@@ -19,6 +19,14 @@ TRAFARET_CONF = T.Dict({
                     'blacklist': T.String(),
                 })
         }),
+    T.Key('sqlalchemy'):
+        T.Dict({
+            'url': T.String(),
+            'client_encoding': T.String(),
+            'pool_reset_on_return': T.String(),
+            'pool_size': T.Int(),
+            'max_overflow': T.Int(),
+        }),
     T.Key('debug'): T.Dict({
         T.Key('status', default=False): T.Bool(),
         T.Key('console', default=False): T.Bool(),

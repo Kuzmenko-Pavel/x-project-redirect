@@ -6,10 +6,10 @@ __author__ = 'kuzmenko-pavel'
 from sqlalchemy import Column, String, Integer, BigInteger, Text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy_utils import force_auto_coercion, force_instant_defaults, ChoiceType, URLType, LtreeType, UUIDType
-from facebook_exporter.models.choiceTypes import CurrencyType
+from x_project_redirect.celery_worker.models.choiceTypes import CurrencyType
 
 from .custom_arrays import ArrayOfCustomType
-from facebook_exporter.models.meta import ParentBase
+from x_project_redirect.celery_worker.models.meta import ParentBase
 
 force_auto_coercion()
 force_instant_defaults()

@@ -36,6 +36,7 @@ install_requires = ['aiohttp',
                     'sqlalchemy',
                     'psycopg2',
                     'zope.sqlalchemy==1.1',
+                    'sqlalchemy_utils'
                     ]
 
 setup(

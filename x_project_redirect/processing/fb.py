@@ -1,8 +1,8 @@
 from datetime import datetime
-import time
-from .base import BaseProcessing
+
 from x_project_redirect.celery_worker.tasks import add
 from x_project_redirect.logger import logger, exception_message
+from .base import BaseProcessing
 
 
 class FbProcessing(BaseProcessing):
@@ -52,43 +52,29 @@ class FbProcessing(BaseProcessing):
         id_offer = params.get('oid')
         id_campaign = params.get('cid')
         id_account_left = params.get('aidl')
-        test = bool(int(params.get('t', 0)))
-        clicks_cost_right = float(params.get('ccr', 0))
-        clicks_cost_left = float(params.get('ccl', 0))
-        social = bool(int(params.get('s', 0)))
-        token = params.get('to', '')
         url = params.get('u')
         not_filter = bool(int(params.get('f', 0)))
         time_filter = params.get('tf', 60)
-        clicks_time = (int(time.time() * 1000) - int(params.get('tr', int(time.time() * 1000)))) / 1000
-        valid = True if self.encrypt_decrypt(params.get('ra', ''), ip) == "valid" else False
         referer = self.request.referer
         user_agent = self.request.user_agent
-        if not valid:
-            self.bad_user = 'token'
+        valid = True
         if self.request.bot:
             self.bad_user = 'bt'
-            valid = False
-        if referer != '' and 'yottos.com' not in referer:
-            logger.warning("!!!!!!! FAKE REFERER !!!!!!!!!")
-            self.bad_user = 'referer'
             valid = False
         if all([x is not None for x in [id_block, id_site, id_account_right,
                                         id_offer, id_campaign, id_account_left, url]]):
             url = await self.utm_converter(url, offer=id_offer, campaign=id_campaign, block=id_block)
             try:
                 add.delay(id_block, id_site, id_account_right,
-                            id_offer, id_campaign, id_account_left,
-                            clicks_cost_right, clicks_cost_left,
-                            social, token, clicks_time, valid, not_filter, time_filter,
-                            test, dt, url, ip, referer, user_agent, cookie, self.cid)
+                          id_offer, id_campaign, id_account_left,
+                          valid, not_filter, time_filter,
+                          dt, url, ip, referer, user_agent, cookie, self.cid)
             except Exception as ex:
                 logger.error(exception_message(exc=str(ex), request=str(self.request.message)))
                 add(id_block, id_site, id_account_right,
-                            id_offer, id_campaign, id_account_left,
-                            clicks_cost_right, clicks_cost_left,
-                            social, token, clicks_time, valid, not_filter, time_filter,
-                            test, dt, url, ip, referer, user_agent, cookie, self.cid)
+                    id_offer, id_campaign, id_account_left,
+                    valid, not_filter, time_filter,
+                    dt, url, ip, referer, user_agent, cookie, self.cid)
         else:
             url = 'https://yottos.com'
         return self.http_found(url)

@@ -1,31 +1,37 @@
-import pyodbc
 from datetime import datetime, timedelta
-from uuid import UUID
 
 from dateutil import parser
 
 from x_project_redirect.celery_worker import app
+from x_project_redirect.celery_worker.models import ParentBlock, ParentCampaign
+from x_project_redirect.celery_worker.models.choiceTypes import CampaignPaymentModel
 
-from x_project_redirect.celery_worker.mq import MQ
 
+def blacklist_exist(blacklist, ip, cookie=None):
+    border_cookie_count = 1
+    border_ip_count = 3
+    if cookie is None:
+        cookie = 'FACEBOOK'
+        border_cookie_count = 5
+        border_ip_count = 15
 
-def blacklist_exist(blacklist, ip, cookie):
     cookie_count = blacklist.find({'ip': ip, 'cookie': cookie}).count()
     print('Check blacklist by cookie %s' % cookie_count)
-    if cookie_count >= 1:
+    if cookie_count >= border_cookie_count:
         blacklist.update_many({'ip': ip, 'cookie': cookie}, {'$set': {'dt': datetime.now()}}, upsert=True)
         return True
     ip_count = blacklist.find({'ip': ip}).count()
     print('Check blacklist by ip %s' % ip_count)
-    if ip_count > 3:
+    if ip_count > border_ip_count:
         return True
     return False
 
 
-def check_filter(clicks, blacklist, ip, cookie, id_block, id_offer, dt):
+def check_filter(clicks, blacklist, ip, id_block, id_offer, dt, cookie=None):
     # Ищем, не было ли кликов по этому товару
     # Заодно проверяем ограничение на max_clicks_for_one_day переходов в сутки
     # (защита от накруток)
+
     max_clicks_for_one_day = 3
     max_clicks_for_one_day_all = 5
     max_clicks_for_one_week = 10
@@ -34,6 +40,17 @@ def check_filter(clicks, blacklist, ip, cookie, id_block, id_offer, dt):
     ip_max_clicks_for_one_day_all = 10
     ip_max_clicks_for_one_week = 20
     ip_max_clicks_for_one_week_all = 30
+
+    if cookie is None:
+        cookie = 'FACEBOOK'
+        max_clicks_for_one_day = 30
+        max_clicks_for_one_day_all = 50
+        max_clicks_for_one_week = 100
+        max_clicks_for_one_week_all = 150
+        ip_max_clicks_for_one_day = 60
+        ip_max_clicks_for_one_day_all = 100
+        ip_max_clicks_for_one_week = 200
+        ip_max_clicks_for_one_week_all = 300
 
     # Проверяе по рекламному блоку за день и неделю
     today_clicks = 0
@@ -160,21 +177,178 @@ def check_filter(clicks, blacklist, ip, cookie, id_block, id_offer, dt):
     return unique
 
 
-@app.task(ignore_result=True)
-def add(url, ip, offer, campaign, click_datetime, referer, user_agent, cookie, cid):
+def click_cost_calc(block, campaign):
+    if campaign.payment_model in [CampaignPaymentModel.ppc, CampaignPaymentModel.auto]:
+        cost_percent = block.cost_percent
+        cost_proportion = block.click_cost_proportion
+        cost_min = block.click_cost_min
+        cost_max = block.click_cost_max
+        ccl = campaign.click_cost
+        ccl = round(ccl * cost_percent / 100, 4)
+        ccr = round(ccl * cost_proportion / 100, 4)
+        if cost_min and ccr < cost_min:
+            ccr = cost_min
+        if cost_max and ccr > cost_max:
+            ccr = cost_max
+        return ccr, ccl
+    return 0, 0
+
+
+@app.task(ignore_result=True, bind=True)
+def add(self, id_block, id_site, id_account_right,
+        id_offer, id_campaign, id_account_left,
+        valid, not_filter, time_filter,
+        dt, url, ip, referer, user_agent, cookie, cid):
+    print('===============Start Facebook Click===============')
     try:
-        dt = parser.parse(click_datetime)
+        print("Block ID = %s" % id_block)
+    except Exception:
+        pass
+    try:
+        print("Site ID = %s" % id_site)
+    except Exception:
+        pass
+    try:
+        print("Getmyad ID = %s" % id_account_right)
+    except Exception:
+        pass
+    try:
+        print("Offer ID = %s" % id_offer)
+    except Exception:
+        pass
+    try:
+        print("Campaign ID = %s" % id_campaign)
+    except Exception:
+        pass
+    try:
+        print("Adload ID = %s" % id_account_left)
+    except Exception:
+        pass
+    try:
+        print("Valid = %s" % valid)
+    except Exception:
+        pass
+    try:
+        print("Not Filter = %s" % not_filter)
+    except Exception:
+        pass
+    try:
+        print("Time Filter = %s" % time_filter)
+    except Exception:
+        pass
+    try:
+        print("Date = %s" % dt)
+    except Exception:
+        pass
+    try:
+        print("Url = %s" % url)
+    except Exception:
+        pass
+    try:
+        print("IP = %s" % ip)
+    except Exception:
+        pass
+    try:
+        print("Referer = %s" % referer)
+    except Exception:
+        pass
+    try:
+        print("User Agent = %s" % user_agent)
+    except Exception:
+        pass
+    try:
+        print("Cookie = %s" % cookie)
+    except Exception:
+        pass
+    try:
+        print("CID = %s" % cid)
+    except Exception:
+        pass
+
+    unique = True
+    suspicious = False
+    filtered = False
+    banned = False
+    try:
+        dt = parser.parse(dt)
     except (ValueError, AttributeError, TypeError):
         dt = datetime.now()
-    print(url, ip, offer, campaign, dt, referer, user_agent, cookie, cid, sep='\n')
-    print("Adload request")
-    # adload_response = add_click(offer, campaign, dt.isoformat())
-    # adload_ok = adload_response.get('ok', False)
-    # adload_cost = 0
-    # if adload_ok:
-    #     adload_cost = adload_response['cost']
 
-    print("Adload OK - %s" % adload_ok)
+    if not not_filter:
+        if not valid:
+            print("NOT VALID ip:%s" % ip)
+            banned = True
+            unique = False
+        else:
+            if blacklist_exist(self.collection_blacklist, ip, cookie):
+                print("Blacklisted ip:%s" % ip)
+                banned = True
+                valid = False
+                unique = False
+
+            if valid:
+                if referer is None:
+                    print('Without Referer ip:%s' % ip)
+                    suspicious = True
+
+                if user_agent is None:
+                    print('Without User Agent ip:%s' % ip)
+                    suspicious = True
+
+                unique = check_filter(self.collection_click, self.collection_blacklist,
+                                      ip, id_block, id_offer, dt, cookie)
+                print('Unique:%s' % unique)
+
+    clicks_cost_right = 0
+    clicks_cost_left = 0
+    block = self.dbsession.query(ParentBlock).filter(ParentBlock.id == id_block).one_or_none()
+    campaign = self.dbsession.query(ParentCampaign).filter(ParentCampaign.id == id_campaign).one_or_none()
+    if block and campaign:
+        clicks_cost_right, clicks_cost_left = click_cost_calc(block, campaign)
+
+    try:
+        print("Getmyad Click Cost = %s" % clicks_cost_right)
+    except Exception:
+        pass
+    try:
+        print("Adload Click Cost = %s" % clicks_cost_left)
+    except Exception:
+        pass
+
+    if not unique or not valid or banned:
+        print('Reset click cost')
+        clicks_cost_right = 0
+        clicks_cost_left = 0
+
+    click_obj = {
+        "id_account_right": id_account_right,
+        "id_site": id_site,
+        "clicks_cost_right": clicks_cost_right,
+        "id_block": id_block,
+        "clicks_cost_left": clicks_cost_left,
+        "token": '',
+        "id_campaign": id_campaign,
+        "clicks_time": 60,
+        "valid": valid,
+        "cookie": cookie,
+        "social": False,
+        "id_offer": id_offer,
+        "dt": dt,
+        "ip": ip,
+        "id_account_left": id_account_left,
+        "referer": referer,
+        "user_agent": user_agent,
+        "url": url,
+        "cid": cid,
+        "unique": unique,
+        "suspicious": suspicious,
+        "filtered": filtered,
+        "banned": banned
+
+    }
+    self.collection_click.insert_one(click_obj)
+    print('===============Stop Facebook Click===============')
+
     # account_id = get_account(offer, campaign)
     # if account_id:
     #     try:
@@ -334,7 +508,7 @@ def add_x(self, id_block, id_site, id_account_right, id_offer, id_campaign, id_a
                     suspicious = True
 
                 unique = check_filter(self.collection_click, self.collection_blacklist,
-                                      ip, cookie, id_block, id_offer, dt)
+                                      ip, id_block, id_offer, dt, cookie)
                 print('Unique:%s' % unique)
     if not unique or not valid or banned:
         print('Reset click cost')

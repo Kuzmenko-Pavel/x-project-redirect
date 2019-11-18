@@ -17,6 +17,7 @@ TRAFARET_CONF = T.Dict({
                 T.Dict({
                     'click': T.String(),
                     'blacklist': T.String(),
+                    'impression': T.String(),
                 })
         }),
     T.Key('sqlalchemy'):

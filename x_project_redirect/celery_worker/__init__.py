@@ -1,17 +1,16 @@
-from celery import Celery, signals, states
 import os.path
-from os import getpid
 import socket
 import sys
-import yaml
-from pymongo import errors, MongoClient
+from os import getpid
+
 import transaction
+import yaml
+from celery import Celery, signals, states
+from pymongo import errors, MongoClient
+from trafaret_config.simple import read_and_validate
 
 from x_project_redirect.celery_worker.models import get_engine
 from x_project_redirect.celery_worker.models.meta import metadata, DBScopedSession, ParentBase
-
-from trafaret_config.simple import read_and_validate
-
 from x_project_redirect.utils import TRAFARET_CONF
 
 server_name = socket.gethostname()
@@ -150,6 +149,7 @@ def prerun_task(task_id, task, *args, **kwargs):
     task.mongo_connection = mongo_connection(task._app.mongo_config['uri'])
     task.db = task.mongo_connection[task._app.mongo_config['db']]
     task.collection_click = task.db[task._app.mongo_config['collection']['click']]
+    task.collection_impression = task.db[task._app.mongo_config['collection']['impression']]
     task.collection_blacklist = task.db[task._app.mongo_config['collection']['blacklist']]
     task.dbsession = DBScopedSession()
     transaction.begin()

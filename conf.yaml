@@ -1,10 +1,10 @@
 host: 0.0.0.0
-port: 8080
-#port: 8181
+#port: 8080
+port: 8181
 
 celery:
-  broker_url: amqp://x-project-click:x-project-click@amqp.yottos.com/x-project-click
-  #  broker_url: amqp://x-project-click:x-project-click@localhost/x-project-click
+  #  broker_url: amqp://x-project-click:x-project-click@amqp.yottos.com/x-project-click
+  broker_url: amqp://x-project-click:x-project-click@localhost/x-project-click
   task_queue_ha_policy: all
   task_serializer: json
   result_serializer: json
@@ -32,6 +32,7 @@ mongo:
   collection:
     click: log.click
     blacklist: blacklist
+    impression: log.impressions
 
 
 sqlalchemy:

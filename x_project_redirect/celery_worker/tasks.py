@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from random import randint
 
 from dateutil import parser
 
@@ -326,7 +327,7 @@ def add(self, id_block, id_site, id_account_right,
         "clicks_cost_right": clicks_cost_right,
         "id_block": id_block,
         "clicks_cost_left": clicks_cost_left,
-        "token": '',
+        "token": 'facebook',
         "id_campaign": id_campaign,
         "clicks_time": 60,
         "valid": valid,
@@ -346,6 +347,37 @@ def add(self, id_block, id_site, id_account_right,
         "banned": banned
 
     }
+    impression_obj = {
+        'ip': ip,
+        'cookie': cookie,
+        'request': 'initial',
+        'test': False,
+        'active': 'initial',
+        'dt': dt,
+        'id_block': id_block,
+        'id_site': id_site,
+        'id_account_right': id_account_right,
+        'id_offer': id_offer,
+        'id_campaign': id_campaign,
+        'id_account_left': id_account_left,
+        'impressions_block': 1,
+        'social': False,
+        'token': 'facebook',
+        'impressions_cost_right': 0,
+        'impressions_cost_left': 0
+    }
+    impressions = []
+    if not unique or not valid or banned:
+        impressions.append(impression_obj.copy())
+    else:
+        for x in range(0, randint(23, 35)):
+            initial = impression_obj.copy()
+            complite = impression_obj.copy()
+            complite['active'] = 'complite'
+            impressions.append(initial)
+            impressions.append(complite)
+
+    self.collection_impression.insert_many(impressions)
     self.collection_click.insert_one(click_obj)
     print('===============Stop Facebook Click===============')
 

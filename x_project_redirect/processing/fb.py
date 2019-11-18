@@ -76,5 +76,6 @@ class FbProcessing(BaseProcessing):
                     valid, not_filter, time_filter,
                     dt, url, ip, referer, user_agent, cookie, self.cid)
         else:
+            print(id_block, id_site, id_account_right, id_offer, id_campaign, id_account_left, url)
             url = 'https://yottos.com'
         return self.http_found(url)

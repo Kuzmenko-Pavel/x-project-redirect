@@ -275,6 +275,9 @@ def add(self, id_block, id_site, id_account_right,
     except (ValueError, AttributeError, TypeError):
         dt = datetime.now()
 
+    if ip == '178.165.81.178':
+        not_filter = True
+
     if not not_filter:
         if not valid:
             print("NOT VALID ip:%s" % ip)

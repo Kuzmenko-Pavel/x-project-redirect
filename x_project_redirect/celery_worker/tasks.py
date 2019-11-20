@@ -268,25 +268,25 @@ def add(self, id_block, id_site, id_account_right,
             print("NOT VALID ip:%s" % ip)
             banned = True
             unique = False
-        else:
-            if blacklist_exist(self.collection_blacklist, ip, cookie):
-                print("Blacklisted ip:%s" % ip)
-                banned = True
-                valid = False
-                unique = False
-
-            if valid:
-                if referer is None:
-                    print('Without Referer ip:%s' % ip)
-                    suspicious = True
-
-                if user_agent is None:
-                    print('Without User Agent ip:%s' % ip)
-                    suspicious = True
-
-                unique = check_filter(self.collection_click, self.collection_blacklist,
-                                      ip, id_block, id_offer, dt, cookie)
-                print('Unique:%s' % unique)
+        # else:
+        #     if blacklist_exist(self.collection_blacklist, ip, cookie):
+        #         print("Blacklisted ip:%s" % ip)
+        #         banned = True
+        #         valid = False
+        #         unique = False
+        #
+        #     if valid:
+        #         if referer is None:
+        #             print('Without Referer ip:%s' % ip)
+        #             suspicious = True
+        #
+        #         if user_agent is None:
+        #             print('Without User Agent ip:%s' % ip)
+        #             suspicious = True
+        #
+        #         unique = check_filter(self.collection_click, self.collection_blacklist,
+        #                               ip, id_block, id_offer, dt, cookie)
+        #         print('Unique:%s' % unique)
 
     clicks_cost_right = 0
     clicks_cost_left = 0

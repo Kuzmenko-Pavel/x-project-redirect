@@ -8,13 +8,9 @@ from x_project_redirect.celery_worker.models import ParentBlock, ParentCampaign
 from x_project_redirect.celery_worker.models.choiceTypes import CampaignPaymentModel
 
 
-def blacklist_exist(blacklist, ip, cookie=None):
+def blacklist_exist(blacklist, ip, cookie):
     border_cookie_count = 1
     border_ip_count = 3
-    if cookie is None:
-        cookie = 'FACEBOOK'
-        border_cookie_count = 5
-        border_ip_count = 15
 
     cookie_count = blacklist.find({'ip': ip, 'cookie': cookie}).count()
     print('Check blacklist by cookie %s' % cookie_count)
@@ -28,7 +24,7 @@ def blacklist_exist(blacklist, ip, cookie=None):
     return False
 
 
-def check_filter(clicks, blacklist, ip, id_block, id_offer, dt, cookie=None):
+def check_filter(clicks, blacklist, ip, id_block, id_offer, dt, cookie):
     # Ищем, не было ли кликов по этому товару
     # Заодно проверяем ограничение на max_clicks_for_one_day переходов в сутки
     # (защита от накруток)
@@ -41,17 +37,6 @@ def check_filter(clicks, blacklist, ip, id_block, id_offer, dt, cookie=None):
     ip_max_clicks_for_one_day_all = 10
     ip_max_clicks_for_one_week = 20
     ip_max_clicks_for_one_week_all = 30
-
-    if cookie is None:
-        cookie = 'FACEBOOK'
-        max_clicks_for_one_day = 30
-        max_clicks_for_one_day_all = 50
-        max_clicks_for_one_week = 100
-        max_clicks_for_one_week_all = 150
-        ip_max_clicks_for_one_day = 60
-        ip_max_clicks_for_one_day_all = 100
-        ip_max_clicks_for_one_week = 200
-        ip_max_clicks_for_one_week_all = 300
 
     # Проверяе по рекламному блоку за день и неделю
     today_clicks = 0

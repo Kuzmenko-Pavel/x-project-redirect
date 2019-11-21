@@ -16,6 +16,10 @@ celery:
   task_default_routing_key: normal
   imports: [x_project_redirect.celery_worker.tasks,]
   worker_pool_restarts: true
+  worker_max_tasks_per_child: 100
+  worker_enable_remote_control: false
+  worker_send_task_events: false
+  task_send_sent_event: false
   task_routes:
     x_project_redirect.celery_worker.tasks.*:
       queue: click
@@ -39,5 +43,10 @@ sqlalchemy:
   url: postgresql://x_project:x_project@srv-13.yottos.com:5432/x_project?client_encoding=utf8
   client_encoding: utf8
   pool_reset_on_return: commit
-  pool_size: 30
+  pool_size: 1
   max_overflow: 100
+  echo_pool: false
+  echo: false
+  pool_pre_ping: true
+  pool_recycle: 3600
+  pool_use_lifo: false

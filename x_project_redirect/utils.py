@@ -27,6 +27,11 @@ TRAFARET_CONF = T.Dict({
             'pool_reset_on_return': T.String(),
             'pool_size': T.Int(),
             'max_overflow': T.Int(),
+            'echo_pool': T.Bool(),
+            'echo': T.Bool(),
+            'pool_pre_ping': T.Bool(),
+            'pool_recycle': T.Int(),
+            'pool_use_lifo': T.Bool()
         }),
     T.Key('debug'): T.Dict({
         T.Key('status', default=False): T.Bool(),

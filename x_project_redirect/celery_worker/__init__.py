@@ -20,11 +20,11 @@ app = None
 
 def standard_argparse_options(argument_parser, default_config):
     argument_parser.add_argument('-y', '--yaml', default=default_config,
-        help="Configuration file (default: %(default)r)")
+                                 help="Configuration file (default: %(default)r)")
     argument_parser.add_argument('--print-yaml-config', action='store_true',
-        help="Print config as it is read after parsing and exit")
+                                 help="Print config as it is read after parsing and exit")
     argument_parser.add_argument('-Y', '--check-yaml-config', action='store_true',
-        help="Check configuration and exit")
+                                 help="Check configuration and exit")
 
 
 def config_from_options(options, trafaret):
@@ -110,7 +110,7 @@ def mongo_connection(host):
 def check_collection(config):
     avg_obj_size = 500
     max_obj = 5000000
-    collection = {'click': 'log.click'}#config['collection']
+    collection = {'click': 'log.click'}  # config['collection']
     collection_name = [x for x in collection.values()]
     connection = mongo_connection(config['uri'])
     db = connection[config['db']]
@@ -131,12 +131,12 @@ def init_celery(config):
     app.mongo_config = get_mongo_configuration(config)
     app.sqlalchemy_config = get_sqlalchemy_configuration(config)
     check_collection(app.mongo_config)
-    application_name = 'Celery Worker on %s pid=%s' % (server_name, getpid())
+    application_name = 'Celery Click Redirect on %s pid=%s' % (server_name, getpid())
     try:
         if '-Q' in sys.argv:
             if sys.argv.index('-Q') + 1 < len(sys.argv):
-                application_name = 'Celery Worker %s on %s pid=%s' % (sys.argv[sys.argv.index('-Q') + 1],
-                                                                      server_name, getpid())
+                application_name = 'Celery Click Redirect %s on %s pid=%s' % (sys.argv[sys.argv.index('-Q') + 1],
+                                                                              server_name, getpid())
     except Exception:
         pass
     engine = get_engine(app.sqlalchemy_config, prefix='', connect_args={"application_name": application_name})
@@ -177,8 +177,8 @@ def postrun_task(task_id, task, state, *args, **kwargs):
     except Exception as e:
         print('postrun_task close', e)
 
-load()
 
+load()
 
 if __name__ == '__main__':
     app.start()

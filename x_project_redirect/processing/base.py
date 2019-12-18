@@ -1,10 +1,11 @@
-from aiohttp.web import HTTPNotImplemented, HTTPFound
-import aiohttp_jinja2
 import base64
 import binascii
-from uuid import uuid4
-from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse, unquote
 import random
+from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse, unquote
+from uuid import uuid4
+
+import aiohttp_jinja2
+from aiohttp.web import HTTPNotImplemented, HTTPFound
 
 from x_project_redirect.logger import logger, exception_message
 
@@ -18,7 +19,6 @@ class BaseProcessing:
     utm_medium = 'yottos'
     utm_term = 'yottos'
     utm_rand = str(random.randint(0, 1000000))
-    cid = str(uuid4())
     bad_user = None
 
     makros = ['{source}', '{source_id}', '{source_guid}', '{campaign}', '{campaign_id}', '{campaign_guid}', '{name}',
@@ -26,6 +26,10 @@ class BaseProcessing:
 
     def __init__(self, request):
         self.request = request
+
+    @property
+    def cid(self):
+        return str(uuid4())
 
     async def click(self):
         query = self.request.query_string

@@ -26,10 +26,7 @@ class BaseProcessing:
 
     def __init__(self, request):
         self.request = request
-
-    @property
-    def cid(self):
-        return str(uuid4())
+        self.cid = str(uuid4())
 
     async def click(self):
         query = self.request.query_string

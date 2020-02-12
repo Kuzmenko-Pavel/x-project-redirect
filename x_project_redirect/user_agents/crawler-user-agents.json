@@ -11,6 +11,7 @@
       "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
       "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
       "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36",
+      "Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko; Google Page Speed Insights) Chrome\/27.0.1453 Safari\/537.36",
       "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; Google Web Preview Analytics) Chrome/27.0.1453 Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
     ]
   },
@@ -142,7 +143,7 @@
       "Python-urllib/3.4",
       "Python-urllib/3.5",
       "Python-urllib/3.6"
-     ]
+    ]
   },
   {
     "pattern": "python-requests",
@@ -2315,7 +2316,7 @@
       "SBL-BOT (http://sbl.net)"
     ],
     "url": "http://sbl.net",
-    "description" : "Bot of SoftByte BlackWidow"
+    "description": "Bot of SoftByte BlackWidow"
   },
   {
     "pattern": "IAS crawler",
@@ -2324,7 +2325,7 @@
       "IAS crawler (ias_crawler; http://integralads.com/site-indexing-policy/)"
     ],
     "url": "http://integralads.com/site-indexing-policy/",
-    "description" : "Bot of Integral Ad Science, Inc."
+    "description": "Bot of Integral Ad Science, Inc."
   },
   {
     "pattern": "adscanner",

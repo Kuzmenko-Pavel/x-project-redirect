@@ -1,16 +1,17 @@
-from collections import namedtuple
 import re
+from collections import namedtuple
 
 from ua_parser import user_agent_parser
-from .compat import string_types
 
+from .compat import string_types
 
 BOTS_FAMILIES = (
     'libwww-perl',
     'YATSH crawler'
 )
 
-BOTS_RE = re.compile('spider|phantomjs|casperjs|analyzer|daum|scanner|check|bot|okhttp|omgili|ltx71|curl|wget|newspaper|lipperhey|binlar|ahc|apache|proximic|embedly|http-client|preview|flipboard|parser|ips-agent|nutch|httrack|brandverity|fetch|httpunit|http_get|siteimprove|vkshare|siteexplorer|python|sentry|coccoc')
+BOTS_RE = re.compile(
+    'spider|phantomjs|casperjs|analyzer|daum|scanner|check|bot|okhttp|omgili|ltx71|curl|wget|newspaper|lipperhey|binlar|ahc|apache|proximic|embedly|http-client|preview|flipboard|parser|ips-agent|nutch|httrack|brandverity|fetch|httpunit|http_get|siteimprove|vkshare|siteexplorer|python|sentry|coccoc|headless|page speed|insights|gtmetrix|lighthouse|analyze|woorank')
 
 MOBILE_DEVICE_FAMILIES = (
     'iPhone',
@@ -321,5 +322,33 @@ def parse(user_agent_string):
 
 
 def simple_parse(user_agent_string):
+    user_agent = UserAgent(user_agent_string)
+
+    if user_agent.is_bot:
+        return 'bt'
+
+    if user_agent.is_pc:
+        return 'pc'
+
+    if user_agent.is_mobile:
+        if user_agent.is_apple:
+            return 'ap'
+        elif user_agent.is_android:
+            return 'np'
+        elif user_agent.is_windows:
+            return 'wp'
+
+    if user_agent.is_tablet:
+        if user_agent.is_apple:
+            return 'at'
+        elif user_agent.is_android:
+            return 'nt'
+        elif user_agent.is_windows:
+            return 'wt'
+
+    return 'oh'
+
+
+def bot_detect(user_agent_string):
     user_agent = UserAgent(user_agent_string)
     return user_agent.is_bot

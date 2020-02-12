@@ -1,22 +1,26 @@
-from aiohttp import hdrs, web
-import time
 import re
+import time
 from datetime import datetime, timedelta
 
-from x_project_redirect.logger import logger, exception_message
+from aiohttp import web
 
+from x_project_redirect.headers import *
+from x_project_redirect.logger import logger, exception_message
 
 ip_regex = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
 
 
+@not_robot()
 async def handle_404(request, response):
     return web.Response(text='')
 
 
+@not_robot()
 async def handle_405(request, response):
     return web.Response(text='')
 
 
+@not_robot()
 async def handle_500(request, response):
     return web.Response(text='')
 

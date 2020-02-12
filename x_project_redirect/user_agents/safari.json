@@ -3101,11 +3101,6 @@
   },
   {
     "commonality": "Uncommon",
-    "version": "8",
-    "ua": "Mozilla\/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit\/537.36 (KHTML, like Gecko; Google Page Speed Insights) Version\/8.0 Mobile\/12F70 Safari\/600.1.4"
-  },
-  {
-    "commonality": "Uncommon",
     "version": "5",
     "ua": "Mozilla\/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-us) AppleWebKit\/533.19.4 (KHTML, like Gecko) Version\/5.0.3 Safari\/533.19.4"
   },
@@ -3158,11 +3153,6 @@
     "commonality": "Uncommon",
     "version": "9",
     "ua": "Mozilla\/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit\/536.26 (KHTML, like Gecko) Version\/9.0 Mobile\/10A5355d Safari\/8536.25"
-  },
-  {
-    "commonality": "Uncommon",
-    "version": "6",
-    "ua": "Mozilla\/5.0 (iPhone; CPU iPhone OS 6_0_1 like Mac OS X) AppleWebKit\/537.36 (KHTML, like Gecko; Google Page Speed Insights) Version\/6.0 Mobile\/10A525 Safari\/8536.25"
   },
   {
     "commonality": "Uncommon",
@@ -5033,11 +5023,6 @@
     "commonality": "Uncommon",
     "version": "",
     "ua": "Mozilla\/5.0 (Windows NT 6.1) AppleWebKit\/535.3 (KHTML, like Gecko) Safari\/535.3 EAWebKit\/13.4.2.0.0 APB\/2.0"
-  },
-  {
-    "commonality": "Uncommon",
-    "version": "6",
-    "ua": "Mozilla\/5.0 (iPhone; CPU iPhone OS 6_0_1 like Mac OS X) AppleWebKit\/537.4 (KHTML, like Gecko; Google Page Speed Insights) Version\/6.0 Mobile\/10A525 Safari\/8536.25"
   },
   {
     "commonality": "Uncommon",

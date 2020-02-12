@@ -1,13 +1,14 @@
 __all__ = ['cache', 'cookie', 'csp', 'not_robot', 'detect_bot']
 import asyncio
 import functools
-from datetime import datetime, timedelta
 import time
+from datetime import datetime, timedelta
 from uuid import uuid4
+
 from aiohttp import web, hdrs
 from aiohttp.abc import AbstractView
 
-from x_project_redirect.user_agents import simple_parse
+from x_project_redirect.user_agents import bot_detect
 
 
 def cache():
@@ -120,9 +121,9 @@ def detect_bot():
         @functools.wraps(func)
         def wrapped(*args):
             if isinstance(args[0], AbstractView):
-                args[0].request.bot = simple_parse(args[0].request.headers[hdrs.USER_AGENT])
+                args[0].request.bot = bot_detect(args[0].request.headers[hdrs.USER_AGENT])
             else:
-                args[-1].bot = simple_parse(args[-1].headers[hdrs.USER_AGENT])
+                args[-1].bot = bot_detect(args[-1].headers[hdrs.USER_AGENT])
 
             if asyncio.iscoroutinefunction(func):
                 coro = func
@@ -147,6 +148,10 @@ def not_robot():
             context = yield from coro(*args)
             if isinstance(context, web.StreamResponse):
                 context.headers['X-Robots-Tag'] = 'noindex, nofollow, noarchive, notranslate, noimageindex'
+                context.headers['X-Frame-Options'] = 'sameorigin'
+                context.headers['X-XSS-Protection'] = '1; mode=block'
+                context.headers['Accept-CH'] = 'device-memory, dpr, width, viewport-width, rtt, downlink, ect'
+                context.headers['Accept-CH-Lifetime'] = '31536000'
                 return context
             return context
         return wrapped

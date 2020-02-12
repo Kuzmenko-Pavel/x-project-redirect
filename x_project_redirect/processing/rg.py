@@ -15,14 +15,20 @@ class RgProcessing(BaseProcessing):
     async def click(self):
         query = self.request.query_string
         location = self.request.app.router['validate'].url_for(source=self.source).with_query(query)
+        if self.request.referer != '' and 'yottos.com' not in self.request.referer:
+            logger.warning(exception_message(exc='FAKE REFERER', request=str(self.request.message)))
+            return self.http_header_found(location)
         if self.request.bot:
             logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
-            return self.http_found(location)
+            return self.http_header_found(location)
         return self.http_found(location)
 
     async def validate(self):
         query = self.request.query_string
         location = self.request.app.router['filtered'].url_for(source=self.source).with_query(query)
+        if self.request.referer != '' and 'yottos.com' not in self.request.referer:
+            logger.warning(exception_message(exc='FAKE REFERER', request=str(self.request.message)))
+            return self.http_header_found(location)
         if self.request.bot:
             logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
             return self.http_header_found(location)
@@ -31,6 +37,9 @@ class RgProcessing(BaseProcessing):
     async def filtered(self):
         query = self.request.query_string
         location = self.request.app.router['redirect'].url_for(source=self.source).with_query(query)
+        if self.request.referer != '' and 'yottos.com' not in self.request.referer:
+            logger.warning(exception_message(exc='FAKE REFERER', request=str(self.request.message)))
+            return self.http_js_found(location)
         if self.request.bot:
             logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
             return self.http_js_found(location)

@@ -182,7 +182,8 @@ class BaseProcessing:
         return HTTPFound(url)
 
     def http_header_found(self, url):
-        return aiohttp_jinja2.render_template('header_found.html', self.request, {'url': url})
+        return aiohttp_jinja2.render_template('header_found.html', self.request,
+                                              {'url': url, 'nonce': self.request.nonce})
 
     def http_js_found(self, url):
         return aiohttp_jinja2.render_template('js_found.html', self.request, {'url': url, 'nonce': self.request.nonce})

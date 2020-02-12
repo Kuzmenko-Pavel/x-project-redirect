@@ -2,7 +2,7 @@ import re
 import time
 from datetime import datetime, timedelta
 
-from aiohttp import web
+from aiohttp import web, hdrs
 
 from x_project_redirect.headers import *
 from x_project_redirect.logger import logger, exception_message
@@ -97,7 +97,7 @@ async def ip_middleware(app, handler):
 async def referer_middleware(app, handler):
     async def middleware(request):
         headers = request.headers
-        request.referer = headers.get('Referer', '')
+        request.referer = headers.get(hdrs.REFERER, '')
         response = await handler(request)
         return response
 
@@ -107,7 +107,7 @@ async def referer_middleware(app, handler):
 async def user_agent_middleware(app, handler):
     async def middleware(request):
         headers = request.headers
-        request.user_agent = headers.get('User-Agent', '')
+        request.user_agent = headers.get(hdrs.USER_AGENT, '')
         response = await handler(request)
         return response
 

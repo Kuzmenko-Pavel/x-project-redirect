@@ -3,7 +3,10 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="robots" content="noindex nofollow noarchive" />
-    <meta http-equiv="refresh" content="1; URL={{ url|safe }}"/>
+    <meta http-equiv="refresh" content="0; URL={{ url|safe }}"/>
+    <script nonce="{{ nonce }}">setTimeout(function () {
+        window.location.href = "{{ url|safe }}"
+    }, 500);</script>
 </head>
 <body>
 </body>

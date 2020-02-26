@@ -18,7 +18,8 @@ class FbProcessing(BaseProcessing):
                 logger.warning(exception_message(exc='FACEBOOK BOT FOUND', request=str(self.request.message)))
                 return self.http_found('https://rt.pornhub.com/')
 
-            logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
+            logger.warning(
+                exception_message(exc='BOT FOUND', request=str(self.request.message), referer=self.request.referer))
             return self.http_found(location)
         return self.http_found(location)
 

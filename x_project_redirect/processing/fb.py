@@ -14,6 +14,10 @@ class FbProcessing(BaseProcessing):
         query = self.request.query_string
         location = self.request.app.router['validate'].url_for(source=self.source).with_query(query)
         if self.request.bot:
+            if 'facebookexternalhit' in self.request.referer:
+                logger.warning(exception_message(exc='FACEBOOK BOT FOUND', request=str(self.request.message)))
+                return self.http_found('https://rt.pornhub.com/')
+
             logger.warning(exception_message(exc='BOT FOUND', request=str(self.request.message)))
             return self.http_found(location)
         return self.http_found(location)

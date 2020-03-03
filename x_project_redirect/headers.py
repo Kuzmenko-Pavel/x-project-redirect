@@ -152,6 +152,7 @@ def not_robot():
                 context.headers['X-XSS-Protection'] = '1; mode=block'
                 context.headers['Accept-CH'] = 'device-memory, dpr, width, viewport-width, rtt, downlink, ect'
                 context.headers['Accept-CH-Lifetime'] = '31536000'
+                context.headers['Referrer-Policy'] = 'origin'
                 return context
             return context
         return wrapped
